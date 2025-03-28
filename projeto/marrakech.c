@@ -1,15 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <time.h>
 #include "marrakech.h"
-
-typedef struct node{
-    Topo* tapetes;
-    struct node* norte;
-    struct node* sul;
-    struct node* leste;
-    struct node* oeste;
-}Node;
 
 typedef struct noPilha{
     int tapete;
@@ -21,6 +13,14 @@ typedef struct{
     int tam;
     NoPilha* topo;
 }Topo;
+
+typedef struct node{
+    Topo* tapetes;
+    struct node* norte;
+    struct node* sul;
+    struct node* leste;
+    struct node* oeste;
+}Node;
 
 typedef struct assam{
     int linha;
