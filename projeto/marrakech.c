@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include "marrakech.h"
 
 typedef struct noPilha{
@@ -25,17 +26,19 @@ typedef struct node{
 typedef struct assam{
     int linha;
     int coluna;
-    char orientacao;
+    char orientacao[6];
     Node* posicao;
 }Assam;
 
 typedef struct jogador{
     int dinheiro;
     int tapetes;
+    char cor[9];
     struct jogador *prox;
 }Jogador;
 
 typedef Node* Tabuleiro;
+typedef Jogador* listaJogadores;
 
 Topo* criarPilhaTapetes(){
     Topo* novoTopo = (Topo*)malloc(sizeof(Topo));
@@ -43,6 +46,11 @@ Topo* criarPilhaTapetes(){
     novoTopo->topo = NULL;
 
     return novoTopo;
+}
+
+void pushPilhaTapetes(Topo *topo, NoPilha *novoTopo){
+    novoTopo->prox = topo->topo;
+    topo->topo = novoTopo;
 }
 
 Node* criarNo(){
@@ -65,20 +73,20 @@ Assam* inicializarAssam(Tabuleiro *tabuleiro){
     srand(time(NULL));
     int or = rand() % 4;
     if(or == 0)
-        novoAssam->orientacao = 'N';
+        strcpy(novoAssam->orientacao, "Norte");
     else if(or == 1)
-        novoAssam->orientacao = 'S';
+        strcpy(novoAssam->orientacao, "Sul");
     else if(or == 2)
-        novoAssam->orientacao = 'L';
+        strcpy(novoAssam->orientacao, "Leste");
     else if(or == 3)
-        novoAssam->orientacao = 'O';
+        strcpy(novoAssam->orientacao, "Oeste");
 
-    Node *aux = *tabuleiro;
+    Node *atual = *tabuleiro;
     for(int i = 1; i < (TAM + 1)/2; i++){
-        aux = aux->leste;
-        aux = aux->sul;
+        atual = atual->leste;
+        atual = atual->sul;
     }
-    novoAssam->posicao = aux;
+    novoAssam->posicao = atual;
 
     return novoAssam;
 }
@@ -181,6 +189,89 @@ Tabuleiro* criar(){
     }
 
     return tabuleiro;
+}
+
+Jogador* criarJogador(){
+    Jogador *novoJogador = (Jogador*)malloc(sizeof(Jogador));
+    strcpy(novoJogador->cor, NULL);
+    novoJogador->dinheiro = 30;
+    novoJogador->prox = NULL;
+    novoJogador->tapetes = 12;
+
+    return novoJogador;
+}
+
+listaJogadores* inicializarJogadores(){
+    listaJogadores *novosJogadores = (listaJogadores)malloc(sizeof(listaJogadores));
+    Jogador *jogador1 = criarJogador();
+    Jogador *jogador2 = criarJogador();
+    Jogador *jogador3 = criarJogador();
+    Jogador *jogador4 = criarJogador();
+    
+    strcpy(jogador1->cor, "Vermelho");
+    strcpy(jogador2->cor, "Azul");
+    strcpy(jogador3->cor, "Amarelo");
+    strcpy(jogador4->cor, "Verde");
+    
+    jogador1->prox = jogador2;
+    jogador2->prox = jogador3;
+    jogador3->prox = jogador4;
+    jogador4->prox = jogador1;
+    *novosJogadores = jogador1;
+
+    return novosJogadores;
+}
+
+void girarAssamHorario(Assam *assam){
+    if(assam->orientacao == "Norte")
+        strcpy(assam->orientacao, "Leste");
+    if(assam->orientacao == "Sul")
+        strcpy(assam->orientacao, "Oeste");
+    if(assam->orientacao == "Leste")
+        strcpy(assam->orientacao, "Sul");
+    if(assam->orientacao == "Oeste")
+        strcpy(assam->orientacao, "Norte");
+}
+
+void girarAssamAntiHorario(Assam *assam){
+    if(assam->orientacao == "Norte")
+        strcpy(assam->orientacao, "Oeste");
+    if(assam->orientacao == "Sul")
+        strcpy(assam->orientacao, "Leste");
+    if(assam->orientacao == "Leste")
+        strcpy(assam->orientacao, "Norte");
+    if(assam->orientacao == "Oeste")
+        strcpy(assam->orientacao, "Sul");
+}
+
+void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
+    Node *inicioLinha = *tabuleiro;
+    Node *atual = NULL;
+
+    for(int i = 0; i < TAM; i++)
+        printf("+----");
+    printf("+");
+    for(int i = 0; i < TAM; i++){
+        printf("\n");
+        atual = inicioLinha;
+        inicioLinha = inicioLinha->sul;
+        for(int j = 0; j < TAM; j++){
+            printf("|");
+            if(assam->posicao == atual)
+                printf(" X  ");
+            else if(atual->tapetes->tam != 0)
+                printf("  %d", atual->tapetes->tam);
+            else
+                printf("    ");
+            atual = atual->leste;
+        }
+        printf("|");
+        printf("\n");
+        for(int i = 0; i < TAM; i++)
+            printf("+----");
+        printf("+");
+    }
+    printf("\n\nOrientacao atual: %s\n\n", assam->orientacao);
 }
 
 /*

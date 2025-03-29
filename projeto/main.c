@@ -6,7 +6,8 @@ int main()
 {   
     Tabuleiro *tabuleiro = criar();
     Assam *assam = inicializarAssam(tabuleiro);
-    //imprimirTeste(tabuleiro);
+    listaJogadores* jogadores = inicializarJogadores();
+    imprimirTabuleiro(tabuleiro, assam);
     system("pause");
     
     return 0;
