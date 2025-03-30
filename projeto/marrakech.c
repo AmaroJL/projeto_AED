@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <windows.h>
 #include "marrakech.h"
 
 typedef struct noPilha{
@@ -33,7 +34,7 @@ typedef struct assam{
 typedef struct jogador{
     int dinheiro;
     int tapetes;
-    char cor[9];
+    char cor[10];
     struct jogador *prox;
 }Jogador;
 
@@ -46,11 +47,6 @@ Topo* criarPilhaTapetes(){
     novoTopo->topo = NULL;
 
     return novoTopo;
-}
-
-void pushPilhaTapetes(Topo *topo, NoPilha *novoTopo){
-    novoTopo->prox = topo->topo;
-    topo->topo = novoTopo;
 }
 
 Node* criarNo(){
@@ -193,7 +189,7 @@ Tabuleiro* criar(){
 
 Jogador* criarJogador(){
     Jogador *novoJogador = (Jogador*)malloc(sizeof(Jogador));
-    strcpy(novoJogador->cor, NULL);
+    strcpy(novoJogador->cor, "\0");
     novoJogador->dinheiro = 30;
     novoJogador->prox = NULL;
     novoJogador->tapetes = 12;
@@ -202,7 +198,8 @@ Jogador* criarJogador(){
 }
 
 listaJogadores* inicializarJogadores(){
-    listaJogadores *novosJogadores = (listaJogadores)malloc(sizeof(listaJogadores));
+    listaJogadores *novosJogadores = (listaJogadores*)malloc(sizeof(listaJogadores));
+
     Jogador *jogador1 = criarJogador();
     Jogador *jogador2 = criarJogador();
     Jogador *jogador3 = criarJogador();
@@ -213,41 +210,46 @@ listaJogadores* inicializarJogadores(){
     strcpy(jogador3->cor, "Amarelo");
     strcpy(jogador4->cor, "Verde");
     
+    
     jogador1->prox = jogador2;
     jogador2->prox = jogador3;
     jogador3->prox = jogador4;
     jogador4->prox = jogador1;
+
     *novosJogadores = jogador1;
 
     return novosJogadores;
 }
 
-void girarAssamHorario(Assam *assam){
-    if(assam->orientacao == "Norte")
-        strcpy(assam->orientacao, "Leste");
-    if(assam->orientacao == "Sul")
-        strcpy(assam->orientacao, "Oeste");
-    if(assam->orientacao == "Leste")
-        strcpy(assam->orientacao, "Sul");
-    if(assam->orientacao == "Oeste")
-        strcpy(assam->orientacao, "Norte");
+void girarAssamHorario(Assam **assam){
+    if(strcmp((*assam)->orientacao, "Norte") == 0){
+        strcpy((*assam)->orientacao, "Leste");
+    }else if(strcmp((*assam)->orientacao, "Leste") == 0){
+        strcpy((*assam)->orientacao, "Sul");
+    }else if(strcmp((*assam)->orientacao, "Sul") == 0){
+        strcpy((*assam)->orientacao, "Oeste");
+    }else if(strcmp((*assam)->orientacao, "Oeste") == 0){
+        strcpy((*assam)->orientacao, "Norte");
+    }
 }
 
-void girarAssamAntiHorario(Assam *assam){
-    if(assam->orientacao == "Norte")
-        strcpy(assam->orientacao, "Oeste");
-    if(assam->orientacao == "Sul")
-        strcpy(assam->orientacao, "Leste");
-    if(assam->orientacao == "Leste")
-        strcpy(assam->orientacao, "Norte");
-    if(assam->orientacao == "Oeste")
-        strcpy(assam->orientacao, "Sul");
+void girarAssamAntiHorario(Assam **assam){
+    if(strcmp((*assam)->orientacao, "Norte") == 0){
+        strcpy((*assam)->orientacao, "Oeste");
+    }else if(strcmp((*assam)->orientacao, "Oeste") == 0){
+        strcpy((*assam)->orientacao, "Sul");
+    }else if(strcmp((*assam)->orientacao, "Sul") == 0){
+        strcpy((*assam)->orientacao, "Leste");
+    }else if(strcmp((*assam)->orientacao, "Leste") == 0){
+        strcpy((*assam)->orientacao, "Norte");
+    }
 }
 
 void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     Node *inicioLinha = *tabuleiro;
     Node *atual = NULL;
 
+    printf("\n");
     for(int i = 0; i < TAM; i++)
         printf("+----");
     printf("+");
@@ -272,6 +274,54 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
         printf("+");
     }
     printf("\n\nOrientacao atual: %s\n\n", assam->orientacao);
+}
+
+void imprimirJogadorAtual(Jogador *jogadorAtual){
+    printf("\nVez do jogador %s\nTapetes restantes: %d\nMoedas restantes: %d\n\n", jogadorAtual->cor, jogadorAtual->tapetes, jogadorAtual->dinheiro);
+}
+
+void avancarJogador(Jogador **jogadorAtual){
+    *jogadorAtual = (*jogadorAtual)->prox;
+}
+
+/*void moverAssam(Assam **assam, int resultado){
+    int mov = resultado;
+    while(mov > 0){
+        if()
+    }
+}*/
+
+void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
+    char girarAssam, direcao;
+    printf("\nGirar assam?(S para sim e N para nao) ");
+    scanf("%c", &girarAssam);
+    while(getchar() != '\n');
+
+    if(girarAssam != 's' && girarAssam != 'S' && girarAssam != 'n' && girarAssam != 'N'){
+        printf("\nDigite uma opcao valida: ");
+        do{
+            scanf("%c", &girarAssam);
+            while(getchar() != '\n');
+        }while(girarAssam != 's' && girarAssam != 'S' && girarAssam != 'n' && girarAssam != 'N');
+    }
+
+    if(girarAssam == 's' || girarAssam == 'S'){
+        printf("\nPara qual direcao?(D ou d para direita, E ou epara esuqerda) ");
+        scanf("%c", &direcao);
+        while(getchar() != '\n');
+        if(direcao == 'D' || direcao == 'd')
+            girarAssamHorario(assam);
+        if(direcao == 'E' || direcao == 'e')
+            girarAssamAntiHorario(assam);
+    }
+    printf("\nPressione enter para rolar o dado");
+    getchar();
+    printf("\nRolando dado...");
+    Sleep(1000);
+    int resultado = (rand() % 6) / 2 + 1;
+    printf("\nResultado: %d\n", resultado);
+    
+    avancarJogador(jogadorAtual);
 }
 
 /*

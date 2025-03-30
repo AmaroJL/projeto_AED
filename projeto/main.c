@@ -7,8 +7,13 @@ int main()
     Tabuleiro *tabuleiro = criar();
     Assam *assam = inicializarAssam(tabuleiro);
     listaJogadores* jogadores = inicializarJogadores();
-    imprimirTabuleiro(tabuleiro, assam);
-    system("pause");
+    Jogador *jogadorAtual = *jogadores;
+    int jogoEncerrado = 0;
+    while(jogoEncerrado == 0){
+        imprimirTabuleiro(tabuleiro, assam);
+        imprimirJogadorAtual(jogadorAtual);
+        fazerJogada(tabuleiro, &assam, &jogadorAtual);
+    }
     
     return 0;
 }
