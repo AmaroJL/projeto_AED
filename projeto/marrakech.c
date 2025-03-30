@@ -284,12 +284,21 @@ void avancarJogador(Jogador **jogadorAtual){
     *jogadorAtual = (*jogadorAtual)->prox;
 }
 
-/*void moverAssam(Assam **assam, int resultado){
+void moverAssam(Assam **assam, int resultado){
     int mov = resultado;
-    while(mov > 0){
-        if()
+
+    for(int i = 0; i < mov; i++) {
+        if(strcmp((*assam)->orientacao, "Norte") == 0) {
+            (*assam)->posicao = (*assam)->posicao->norte;
+        } else if(strcmp((*assam)->orientacao, "Leste") == 0) {
+            (*assam)->posicao = (*assam)->posicao->leste;
+        } else if(strcmp((*assam)->orientacao, "Sul") == 0) {
+            (*assam)->posicao = (*assam)->posicao->sul;
+        } else if(strcmp((*assam)->orientacao, "Oeste") == 0) {
+            (*assam)->posicao = (*assam)->posicao->oeste;
+        }
     }
-}*/
+}
 
 void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     char girarAssam, direcao;
@@ -309,6 +318,15 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
         printf("\nPara qual direcao?(D ou d para direita, E ou epara esuqerda) ");
         scanf("%c", &direcao);
         while(getchar() != '\n');
+
+        if(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E'){
+            printf("\nDigite uma opcao valida: ");
+            do{
+                scanf("%c", &direcao);
+                while(getchar() != '\n');
+            }while(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E');
+        }
+
         if(direcao == 'D' || direcao == 'd')
             girarAssamHorario(assam);
         if(direcao == 'E' || direcao == 'e')
@@ -321,6 +339,7 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     int resultado = (rand() % 6) / 2 + 1;
     printf("\nResultado: %d\n", resultado);
     
+    moverAssam(assam, resultado);
     avancarJogador(jogadorAtual);
 }
 
