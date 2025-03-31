@@ -414,7 +414,6 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     Sleep(1000);
     int resultado = (rand() % 6) / 2 + 1;
     printf("\nResultado: %d\n", resultado);
-    moverAssam(assam, resultado);
     
     moverAssam(assam, resultado);
     avancarJogador(jogadorAtual);
