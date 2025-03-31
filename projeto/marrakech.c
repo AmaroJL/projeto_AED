@@ -285,6 +285,7 @@ void avancarJogador(Jogador **jogadorAtual){
 }
 
 void moverAssam(Assam **assam, int resultado){
+<<<<<<< HEAD
     for(int i = 0; i < resultado; i++){
         if((*assam)->linha == 1 && strcmp((*assam)->orientacao, "Norte") == 0){
             if((*assam)->posicao != (*assam)->posicao->norte){
@@ -372,6 +373,19 @@ void moverAssam(Assam **assam, int resultado){
                 (*assam)->posicao = (*assam)->posicao->oeste;
                 (*assam)->coluna--;
             }
+=======
+    int mov = resultado;
+
+    for(int i = 0; i < mov; i++) {
+        if(strcmp((*assam)->orientacao, "Norte") == 0) {
+            (*assam)->posicao = (*assam)->posicao->norte;
+        } else if(strcmp((*assam)->orientacao, "Leste") == 0) {
+            (*assam)->posicao = (*assam)->posicao->leste;
+        } else if(strcmp((*assam)->orientacao, "Sul") == 0) {
+            (*assam)->posicao = (*assam)->posicao->sul;
+        } else if(strcmp((*assam)->orientacao, "Oeste") == 0) {
+            (*assam)->posicao = (*assam)->posicao->oeste;
+>>>>>>> fc9fbb346e6756efa450c9416db5ae9b77c617ad
         }
     }
 }
@@ -394,6 +408,15 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
         printf("\nPara qual direcao?(D ou d para direita, E ou epara esuqerda) ");
         scanf("%c", &direcao);
         while(getchar() != '\n');
+
+        if(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E'){
+            printf("\nDigite uma opcao valida: ");
+            do{
+                scanf("%c", &direcao);
+                while(getchar() != '\n');
+            }while(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E');
+        }
+
         if(direcao == 'D' || direcao == 'd')
             girarAssamHorario(assam);
         if(direcao == 'E' || direcao == 'e')
@@ -407,5 +430,6 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     printf("\nResultado: %d\n", resultado);
     moverAssam(assam, resultado);
     
+    moverAssam(assam, resultado);
     avancarJogador(jogadorAtual);
 }
