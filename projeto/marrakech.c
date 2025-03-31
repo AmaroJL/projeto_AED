@@ -284,12 +284,97 @@ void avancarJogador(Jogador **jogadorAtual){
     *jogadorAtual = (*jogadorAtual)->prox;
 }
 
-/*void moverAssam(Assam **assam, int resultado){
-    int mov = resultado;
-    while(mov > 0){
-        if()
+void moverAssam(Assam **assam, int resultado){
+    for(int i = 0; i < resultado; i++){
+        if((*assam)->linha == 1 && strcmp((*assam)->orientacao, "Norte") == 0){
+            if((*assam)->posicao != (*assam)->posicao->norte){
+                if((*assam)->posicao->norte == (*assam)->posicao->oeste){
+                    (*assam)->posicao = (*assam)->posicao->norte;
+                    strcpy((*assam)->orientacao, "Sul");
+                    (*assam)->coluna--;
+                }else if((*assam)->posicao->norte == (*assam)->posicao->leste){
+                    (*assam)->posicao = (*assam)->posicao->norte;
+                    strcpy((*assam)->orientacao, "Sul");
+                    (*assam)->coluna++;
+                }
+            }else{
+                if((*assam)->posicao->norte == (*assam)->posicao->oeste){
+                    strcpy((*assam)->orientacao, "Leste");
+                }else if((*assam)->posicao->norte == (*assam)->posicao->leste){
+                    strcpy((*assam)->orientacao, "Oeste");
+                }
+            }
+        }else if((*assam)->coluna == TAM && strcmp((*assam)->orientacao, "Leste") == 0){
+            if((*assam)->posicao != (*assam)->posicao->leste){
+                if((*assam)->posicao->leste == (*assam)->posicao->norte){
+                    (*assam)->posicao = (*assam)->posicao->leste;
+                    strcpy((*assam)->orientacao, "Oeste");
+                    (*assam)->linha--;
+                }else if((*assam)->posicao->leste == (*assam)->posicao->sul){
+                    (*assam)->posicao = (*assam)->posicao->leste;
+                    strcpy((*assam)->orientacao, "Oeste");
+                    (*assam)->linha++;
+                }
+            }else{
+                if((*assam)->posicao->leste == (*assam)->posicao->norte){
+                    strcpy((*assam)->orientacao, "Sul");
+                }else if((*assam)->posicao->leste == (*assam)->posicao->sul){
+                    strcpy((*assam)->orientacao, "Norte");
+                }
+            }
+        }else if((*assam)->linha == TAM && strcmp((*assam)->orientacao, "Sul") == 0){
+            if((*assam)->posicao != (*assam)->posicao->sul){
+                if((*assam)->posicao->sul == (*assam)->posicao->oeste){
+                    (*assam)->posicao = (*assam)->posicao->sul;
+                    strcpy((*assam)->orientacao, "Norte");
+                    (*assam)->coluna--;
+                }else if((*assam)->posicao->sul == (*assam)->posicao->leste){
+                    (*assam)->posicao = (*assam)->posicao->sul;
+                    strcpy((*assam)->orientacao, "Norte");
+                    (*assam)->coluna++;
+                }
+            }else{
+                if((*assam)->posicao->sul == (*assam)->posicao->oeste){
+                    strcpy((*assam)->orientacao, "Leste");
+                }else if((*assam)->posicao->sul == (*assam)->posicao->leste){
+                    strcpy((*assam)->orientacao, "Oeste");
+                }
+            }
+        }else if((*assam)->coluna == 1 && strcmp((*assam)->orientacao, "Oeste") == 0){
+            if((*assam)->posicao != (*assam)->posicao->oeste){
+                if((*assam)->posicao->oeste == (*assam)->posicao->norte){
+                    (*assam)->posicao = (*assam)->posicao->oeste;
+                    strcpy((*assam)->orientacao, "Leste");
+                    (*assam)->linha--;
+                }else if((*assam)->posicao->oeste == (*assam)->posicao->sul){
+                    (*assam)->posicao = (*assam)->posicao->oeste;
+                    strcpy((*assam)->orientacao, "Leste");
+                    (*assam)->linha++;
+                }
+            }else{
+                if((*assam)->posicao->oeste == (*assam)->posicao->norte){
+                    strcpy((*assam)->orientacao, "Sul");
+                }else if((*assam)->posicao->oeste == (*assam)->posicao->sul){
+                    strcpy((*assam)->orientacao, "Norte");
+                }
+            }
+        }else{
+            if(strcmp((*assam)->orientacao, "Norte") == 0){
+                (*assam)->posicao = (*assam)->posicao->norte;
+                (*assam)->linha--;
+            }else if(strcmp((*assam)->orientacao, "Leste") == 0){
+                (*assam)->posicao = (*assam)->posicao->leste;
+                (*assam)->coluna++;
+            }else if(strcmp((*assam)->orientacao, "Sul") == 0){
+                (*assam)->posicao = (*assam)->posicao->sul;
+                (*assam)->linha++;
+            }else if(strcmp((*assam)->orientacao, "Oeste") == 0){
+                (*assam)->posicao = (*assam)->posicao->oeste;
+                (*assam)->coluna--;
+            }
+        }
     }
-}*/
+}
 
 void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     char girarAssam, direcao;
@@ -320,39 +405,7 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     Sleep(1000);
     int resultado = (rand() % 6) / 2 + 1;
     printf("\nResultado: %d\n", resultado);
+    moverAssam(assam, resultado);
     
     avancarJogador(jogadorAtual);
 }
-
-/*
-void imprimirTeste(Tabuleiro* tabuleiro){
-    Node* atual = *tabuleiro;
-    Node* anterior = atual;
-    for(int i = 0; i < TAM; i++){
-        for(int j = 0; j < TAM; j++){
-            printf("V: %d ", atual->valor);
-            if(atual->norte)
-                printf("N: %d ", atual->norte->valor);
-            else
-                printf("N: nulo ");
-            if(atual->sul)
-                printf("S: %d ", atual->sul->valor);
-            else
-                printf("S: nulo ");
-            if(atual->leste)
-                printf("L: %d ", atual->leste->valor);
-            else
-                printf("L: nulo ");
-            if(atual->oeste)
-                printf("O: %d ", atual->oeste->valor);
-            else
-                printf("O: nulo ");
-            printf("| ");
-            atual = atual->leste;
-        }
-        printf("\n");
-        atual = anterior->sul;
-        anterior = anterior->sul;
-    }
-}
-*/

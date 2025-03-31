@@ -10,7 +10,6 @@ typedef Jogador* listaJogadores;
 
 Node* criarNo();
 Tabuleiro* criar();
-//void imprimirTeste(Tabuleiro*);
 Assam* inicializarAssam(Tabuleiro*);
 void imprimirTabuleiro(Tabuleiro*, Assam*);
 Jogador* criarJogador();
@@ -20,5 +19,6 @@ void girarAssamAntiHorario(Assam**);
 void imprimirJogadorAtual(Jogador*);
 void avancarJogador(Jogador**);
 void fazerJogada(Tabuleiro*, Assam**, Jogador**);
+void moverAssam(Assam**, int);
 
 #endif // MARRAKECH_H_INCLUDED
