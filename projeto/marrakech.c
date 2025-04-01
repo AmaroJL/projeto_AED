@@ -472,7 +472,3 @@ int nodeEastIsExist(Assam **assam){
         return 1;
     }
 }
-
-void inserirTapete(NoPilha *novoTapete, Assam **assam){
-
-}
