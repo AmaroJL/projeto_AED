@@ -20,5 +20,6 @@ void imprimirJogadorAtual(Jogador*);
 void avancarJogador(Jogador**);
 void fazerJogada(Tabuleiro*, Assam**, Jogador**);
 void moverAssam(Assam**, int);
+void inserirNaPilha(char cor[10], Node *node);
 
 #endif // MARRAKECH_H_INCLUDED

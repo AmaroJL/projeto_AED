@@ -6,8 +6,9 @@
 #include "marrakech.h"
 
 typedef struct noPilha{
-    int tapete;
+    //int tapete; -> creio eu que eu preciso saber nao da qtd, mas da cor do tapete que ta ali
     int jogador;
+    char cor[10];
     struct noPilha* prox;
 }NoPilha;
 
@@ -417,4 +418,29 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     
     moverAssam(assam, resultado);
     avancarJogador(jogadorAtual);
+}
+
+// nao foi compilado
+void inserirNaPilha(char cor[10], Node *node){
+    if(node == NULL || cor == NULL){
+        return;
+    }
+    
+    NoPilha *novo = (NoPilha*)malloc(sizeof(NoPilha));
+    if(novo == NULL){
+        return;
+    }
+
+    novo->jogador = 0;
+    strcpy(novo->cor, cor);
+
+    if(node->tapetes->tam == 0){
+        node->tapetes->topo = novo;
+        novo->prox = NULL;
+    }else{
+        novo->prox = node->tapetes->topo;
+        node->tapetes->topo = novo;
+    }
+
+    node->tapetes->tam++;
 }
