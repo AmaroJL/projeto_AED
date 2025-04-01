@@ -21,5 +21,10 @@ void avancarJogador(Jogador**);
 void fazerJogada(Tabuleiro*, Assam**, Jogador**);
 void moverAssam(Assam**, int);
 void inserirNaPilha(char cor[10], Node *node);
+int nodeNorthIsExist(Assam **);
+int nodeSouthIsExist(Assam **);
+int nodeEastIsExist(Assam **);
+int nodeWestIsExist(Assam **);
+
 
 #endif // MARRAKECH_H_INCLUDED

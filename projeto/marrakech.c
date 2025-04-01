@@ -420,7 +420,6 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     avancarJogador(jogadorAtual);
 }
 
-// nao foi compilado
 void inserirNaPilha(char cor[10], Node *node){
     if(node == NULL || cor == NULL){
         return;
@@ -443,4 +442,37 @@ void inserirNaPilha(char cor[10], Node *node){
     }
 
     node->tapetes->tam++;
+}
+
+//verificam se o nó está dentro do limite do tabuleiro
+int nodeNorthIsExist(Assam **assam){
+    if((*assam) == NULL) return -1;
+    if(((*assam)->linha) - 1 <= TAM && ((*assam)->linha) - 1 >= 1){
+        return 1;
+    }
+}
+
+int nodeSouthIsExist(Assam **assam){
+    if((*assam) == NULL) return -1;
+    if(((*assam)->linha) + 1 <= TAM && ((*assam)->linha) + 1 >= 1){
+        return 1;
+    }
+}
+//oeste
+int nodeWestIsExist(Assam **assam){
+    if((*assam) == NULL) return -1;
+    if(((*assam)->coluna) - 1 <= TAM && ((*assam)->coluna) - 1 >= 1){
+        return 1;
+    }
+}
+//lest
+int nodeEastIsExist(Assam **assam){
+    if((*assam) == NULL) return -1;
+    if(((*assam)->coluna) + 1 <= TAM && ((*assam)->coluna) + 1 >= 1){
+        return 1;
+    }
+}
+
+void inserirTapete(NoPilha *novoTapete, Assam **assam){
+
 }
