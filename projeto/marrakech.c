@@ -6,7 +6,7 @@
 #include "marrakech.h"
 
 typedef struct noPilha{
-    //int tapete; -> creio eu que eu preciso saber nao da qtd, mas da cor do tapete que ta ali
+    //int tapete; -> creio eu que eu preciso saber da cor do tapete que ta ali
     int jogador;
     char cor[10];
     struct noPilha* prox;
