@@ -472,3 +472,94 @@ int nodeEastIsExist(Assam **assam){
         return 1;
     }
 }
+
+void colocarTapete(Assam** assam, Jogador **jogador) {
+    int direcao; 
+    printf("\nColocar o Tapete: \nHorizontal[1] ou vertical[2] ? ");
+    scanf("%d", &direcao);
+    while(direcao != 1 && direcao != 2) {
+        printf("\nDigite uma opcao valida: ");
+        scanf("%d", &direcao);
+    }
+
+    int lado, ladoNS;
+    printf("\nEscolha uma orintacao: Norte[1], Leste[2], Sul[3], Oeste[4]: ");
+    scanf("%d", &lado);
+    while(lado != 1 && lado != 2 && lado != 3 && lado != 4) {
+        printf("\nDigite uma opcao valida: ");
+        scanf("%d", &lado);
+    }
+
+    if(direcao == 1) {
+        if(lado == 2) {
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste);
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->leste);
+        } else if(lado == 4) {
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste);
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->oeste);
+        } else if(lado == 1) {
+            printf("\nNorte-oeste[1] ou Norte-leste[2]: ");
+            scanf("%d", &ladoNS);
+            while(ladoNS != 1 && ladoNS != 2) {
+                printf("Digite uma opcao valida: ");
+                scanf("%d", &ladoNS);
+            }
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte);
+            if(ladoNS == 1) {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->oeste);
+            } else {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->leste);
+            }
+        } else {
+            printf("\nSul-oeste[1] ou Sul-leste[2]: ");
+            scanf("%d", &ladoNS);
+            while(ladoNS != 1 && ladoNS != 2) {
+                printf("Digite uma opcao valida: ");
+                scanf("%d", &ladoNS);
+            }
+            if(ladoNS == 1) {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->oeste);
+            } else {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->leste);
+            }
+        }
+
+    } else {
+        if(lado == 1) {
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte);
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->norte);
+        } else if(lado == 3) {
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->sul);
+        } else if(lado == 2) {
+            printf("\nLeste-norte[1] ou Leste-sul[2]: ");
+            scanf("%d", &ladoNS);
+            while(ladoNS != 1 && ladoNS != 2) {
+                printf("Digite uma opcao valida: ");
+                scanf("%d", &ladoNS);
+            }
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste);
+            if(ladoNS == 1) {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->norte);
+            } else {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->sul);
+            }
+        } else {
+            printf("\nOeste-norte[1] ou Oeste-sul[2]: ");
+            scanf("%d", &ladoNS);
+            while(ladoNS != 1 && ladoNS != 2) {
+                printf("Digite uma opcao valida: ");
+                scanf("%d", &ladoNS);
+            }
+            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste);
+            if(ladoNS == 1) {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->norte);
+            } else {
+                inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->sul);
+            }
+        }
+    }
+    (*jogador)->tapetes--;
+}
