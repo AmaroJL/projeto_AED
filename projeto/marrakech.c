@@ -250,12 +250,17 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     Node *inicioLinha = *tabuleiro;
     Node *atual = NULL;
 
-    printf("\n");
+    printf("\n     ");
+    for(int i = 0; i < TAM; i++)
+        printf("%c    ", i+65);
+    printf("\n   ");
+
     for(int i = 0; i < TAM; i++)
         printf("+----");
     printf("+");
     for(int i = 0; i < TAM; i++){
         printf("\n");
+        printf("%d  ", i+1);
         atual = inicioLinha;
         inicioLinha = inicioLinha->sul;
         for(int j = 0; j < TAM; j++){
@@ -263,13 +268,13 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
             if(assam->posicao == atual)
                 printf(" X  ");
             else if(atual->tapetes->tam != 0)
-                printf("  %d", atual->tapetes->tam);
+                printf("  %d ", atual->tapetes->tam);
             else
                 printf("    ");
             atual = atual->leste;
         }
         printf("|");
-        printf("\n");
+        printf("\n   ");
         for(int i = 0; i < TAM; i++)
             printf("+----");
         printf("+");
