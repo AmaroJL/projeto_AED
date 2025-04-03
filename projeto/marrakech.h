@@ -25,7 +25,6 @@ int nodeNorthIsExist(Assam **);
 int nodeSouthIsExist(Assam **);
 int nodeEastIsExist(Assam **);
 int nodeWestIsExist(Assam **);
-void colocarTapete(Assam**, Jogador**);
-
+void colocarTapete(Tabuleiro*, Assam**, Jogador**);
 
 #endif // MARRAKECH_H_INCLUDED

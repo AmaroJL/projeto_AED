@@ -478,93 +478,100 @@ int nodeEastIsExist(Assam **assam){
     }
 }
 
-void colocarTapete(Assam** assam, Jogador **jogador) {
-    int direcao; 
-    printf("\nColocar o Tapete: \nHorizontal[1] ou vertical[2] ? ");
-    scanf("%d", &direcao);
-    while(direcao != 1 && direcao != 2) {
-        printf("\nDigite uma opcao valida: ");
-        scanf("%d", &direcao);
-    }
+void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
+    int l1, l2;
+    char c1, c2;
+    Node *auxL = *tabuleiro;
+    Node *auxC, *tap1, *tap2;
+    while(1) {
+        printf("\nEscolha da primeira coordenada:\nLinha: ");
+        scanf(" %d", &l1);
+        while(l1 < 1 || l1 > TAM) {
+            printf("Informe uma linha valida: ");
+            getchar();
+            scanf(" %d", &l1);
+        }
+        printf("Coluna: ");
+        scanf(" %c", &c1);
+        c1 = toupper(c1);
+        while(c1-64 < 1 || c1-64 > TAM) {
+            printf("Informe uma coluna valida: ");
+            getchar();
+            scanf(" %c", &c1);
+        }
+        printf("\nEscolha da segunda coordenada:\nLinha: ");
+        scanf(" %d", &l2);
+        while(l2 < 1 || l2 > TAM) {
+            printf("Informe uma linha valida: ");
+            getchar();
+            scanf(" %d", &l2);
+        }
+        printf("Coluna: ");
+        scanf(" %c", &c2);
+        c2 = toupper(c2);
+        while(c2-64 < 1 || c2-64 > TAM) {
+            printf("Informe uma coluna valida: ");
+            getchar();
+            scanf(" %c", &c2);
+        } 
+        while(getchar() != '\n');
 
-    int lado, ladoNS;
-    printf("\nEscolha uma orintacao: Norte[1], Leste[2], Sul[3], Oeste[4]: ");
-    scanf("%d", &lado);
-    while(lado != 1 && lado != 2 && lado != 3 && lado != 4) {
-        printf("\nDigite uma opcao valida: ");
-        scanf("%d", &lado);
-    }
 
-    if(direcao == 1) {
-        if(lado == 2) {
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste);
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->leste);
-        } else if(lado == 4) {
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste);
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->oeste);
-        } else if(lado == 1) {
-            printf("\nNorte-oeste[1] ou Norte-leste[2]: ");
-            scanf("%d", &ladoNS);
-            while(ladoNS != 1 && ladoNS != 2) {
-                printf("Digite uma opcao valida: ");
-                scanf("%d", &ladoNS);
+        auxL = *tabuleiro;
+        for(int i=1; i<=TAM; i++) {
+            auxC = auxL;
+            if(l1 == i) {
+                for(int j=1; j<=TAM; j++) {
+                    if(j == c1-64){
+                        tap1 = auxC;
+                    }
+                    auxC = auxC->leste;
+                }    
             }
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte);
-            if(ladoNS == 1) {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->oeste);
-            } else {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->leste);
+            auxL = auxL->sul;
+        }
+    
+        auxL = *tabuleiro;
+        for(int i=1; i<=TAM; i++) {
+            auxC = auxL;
+            if(l2 == i) {
+                for(int j=1; j<=TAM; j++) {
+                    if(j == c2-64){
+                        tap2 = auxC;
+                    }
+                    auxC = auxC->leste;
+                }    
             }
-        } else {
-            printf("\nSul-oeste[1] ou Sul-leste[2]: ");
-            scanf("%d", &ladoNS);
-            while(ladoNS != 1 && ladoNS != 2) {
-                printf("Digite uma opcao valida: ");
-                scanf("%d", &ladoNS);
-            }
-            if(ladoNS == 1) {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->oeste);
-            } else {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->leste);
+            auxL = auxL->sul;
+        }
+        if((*assam)->posicao->norte != tap1 && (*assam)->posicao->leste != tap1 && (*assam)->posicao->sul != tap1 && (*assam)->posicao->oeste != tap1) {
+            if((*assam)->posicao->norte != tap2 && (*assam)->posicao->leste != tap2 && (*assam)->posicao->sul != tap2 && (*assam)->posicao->oeste != tap2) {
+                printf("\nPelo menos uma das informacoes passadas deve ser adjacente ao Asaam. Tente novamente:");
+                continue;
             }
         }
-
-    } else {
-        if(lado == 1) {
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte);
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->norte->norte);
-        } else if(lado == 3) {
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul);
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->sul->sul);
-        } else if(lado == 2) {
-            printf("\nLeste-norte[1] ou Leste-sul[2]: ");
-            scanf("%d", &ladoNS);
-            while(ladoNS != 1 && ladoNS != 2) {
-                printf("Digite uma opcao valida: ");
-                scanf("%d", &ladoNS);
-            }
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste);
-            if(ladoNS == 1) {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->norte);
-            } else {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->leste->sul);
-            }
-        } else {
-            printf("\nOeste-norte[1] ou Oeste-sul[2]: ");
-            scanf("%d", &ladoNS);
-            while(ladoNS != 1 && ladoNS != 2) {
-                printf("Digite uma opcao valida: ");
-                scanf("%d", &ladoNS);
-            }
-            inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste);
-            if(ladoNS == 1) {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->norte);
-            } else {
-                inserirNaPilha((*jogador)->cor, (*assam)->posicao->oeste->sul);
-            }
+        if(tap1->norte != tap2 && tap1->leste != tap2 && tap1->sul != tap2 && tap1->oeste != tap2) {
+            printf("\nO tapete deve ser colocado em duas posicoes adjacentes. Tente novamente:");
+            continue;
         }
+        if(tap1->tapetes->topo != NULL) {
+            if(tap1->tapetes->topo->prox == tap2->tapetes->topo && tap2->tapetes->topo->prox == tap1->tapetes->topo) {
+                printf("\nO tapete nao pode cobrir totalmete outro tapete. Tente novamente:");
+                continue;
+            } 
+        }
+        if(tap1 == (*assam)->posicao || tap2 == (*assam)->posicao) {
+            printf("\nO tapete nao pode ser colocado de baixo do Assam. Tente novamente:");
+            continue;
+        }
+    
+        inserirNaPilha((*jogador)->cor, tap1);
+        inserirNaPilha((*jogador)->cor, tap2);
+        tap1->tapetes->topo->prox = tap2->tapetes->topo;
+        tap2->tapetes->topo->prox = tap1->tapetes->topo;
+
+        break;
     }
+    
     (*jogador)->tapetes--;
 }
