@@ -26,5 +26,10 @@ int nodeSouthIsExist(Assam **);
 int nodeEastIsExist(Assam **);
 int nodeWestIsExist(Assam **);
 void colocarTapete(Tabuleiro*, Assam**, Jogador**);
+int areaTapete(Assam**);
+int pagarJogador(Assam**, Jogador**);
+int continuarJogadondo(Jogador**);
+int FimDeJogo(Jogador*);
+void condicaoVitoria(Tabuleiro*, Jogador*);
 
 #endif // MARRAKECH_H_INCLUDED

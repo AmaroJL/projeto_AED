@@ -575,3 +575,87 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
     
     (*jogador)->tapetes--;
 }
+
+int areaTapete(Assam **assam) {
+    if((*assam)->posicao->tapetes->topo == NULL) return 0;
+    return (*assam)->posicao->tapetes->tam;
+}
+
+int pagarJogador(Assam **assam, Jogador **jogador) {
+    int area = areaTapete(assam);
+
+    Jogador *aux = (*jogador);
+    while(strcmp(aux->cor, (*assam)->posicao->tapetes->topo->cor) != 0) {
+        aux = aux->prox;
+    }
+    aux->dinheiro += area;
+    return area;
+}
+
+int continuarJogadondo(Jogador **jogador) {
+    if((*jogador)->dinheiro <= 0) {
+        Jogador *aux = (*jogador)->prox;
+        Jogador *ant = (*jogador);
+        while(aux != (*jogador)) {
+            ant = aux;
+            aux = aux->prox;
+        }
+        ant->prox = aux->prox;
+        printf("Jogador %s esta fora\n", (*jogador)->cor);
+        (*jogador) = (*jogador)->prox;
+        free(aux);
+        return 1;
+    }
+    return 0;
+}
+
+int FimDeJogo(Jogador *jogador) {
+    int tap=1;
+    Jogador *aux = jogador;
+    do {
+        aux = aux->prox;
+        if(aux->tapetes > 0) {
+            tap = 0;
+        }            
+    } while(aux != jogador);
+    
+    return tap;
+}
+
+void condicaoVitoria(Tabuleiro *tabuleiro, Jogador *jogador) {
+    int din=0, empate=0;
+    char vencendor[10];
+    Jogador *aux = jogador;
+    do {
+        aux = aux->prox;
+        if(aux->dinheiro > din) {
+            din = aux->dinheiro;
+            strcpy(vencendor, aux->cor);
+        } else if(aux->dinheiro == din) {
+            empate = 1;
+        }
+    } while(aux != jogador);
+    
+    if(empate == 0) {
+        printf("\nVENCEDOR: Jogador %s", vencendor);
+        return;
+    }
+
+    int tapdin=0;
+    empate = 0;
+    do {
+        if((aux->dinheiro + aux->tapetes) > tapdin) {
+            tapdin = aux->dinheiro + aux->tapetes;
+            strcpy(vencendor, aux->cor);
+        } else if((aux->dinheiro + aux->tapetes) == tapdin) {
+            empate = 1;
+        }
+    } while(aux != jogador);
+    if(empate == 0) {
+        printf("\nVENCEDOR: Jogador %s", vencendor);
+    
+    } else {
+        printf("\nEMPATE");
+    }
+
+}

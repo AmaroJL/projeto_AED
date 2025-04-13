@@ -13,7 +13,10 @@ int main()
         imprimirTabuleiro(tabuleiro, assam);
         imprimirJogadorAtual(jogadorAtual);
         fazerJogada(tabuleiro, &assam, &jogadorAtual);
+        if(FimDeJogo(jogadorAtual) == 1) jogoEncerrado = 1;
     }
+    printf("\njogo encerrado!\n");
+    condicaoVitoria(tabuleiro, jogadorAtual);
     
     return 0;
 }
