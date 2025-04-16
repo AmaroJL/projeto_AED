@@ -16,7 +16,7 @@ Jogador* criarJogador();
 listaJogadores* inicializarJogadores();
 void girarAssamHorario(Assam**);
 void girarAssamAntiHorario(Assam**);
-void imprimirJogadorAtual(Jogador*);
+void imprimirJogadorAtual(Jogador*, Assam*);
 void avancarJogador(Jogador**);
 void fazerJogada(Tabuleiro*, Assam**, Jogador**);
 void moverAssam(Assam**, int);

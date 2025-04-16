@@ -3,6 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include <windows.h>
+#include <ctype.h>
 #include "marrakech.h"
 
 typedef struct noPilha{
@@ -260,14 +261,24 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     printf("+");
     for(int i = 0; i < TAM; i++){
         printf("\n");
-        printf("%d  ", i+1);
+        if(i >= 9)
+            printf("%d ", i+1);
+        else
+            printf(" %d ", i+1);
         atual = inicioLinha;
         inicioLinha = inicioLinha->sul;
         for(int j = 0; j < TAM; j++){
             printf("|");
-            if(assam->posicao == atual)
-                printf(" X  ");
-            else if(atual->tapetes->tam != 0)
+            if(assam->posicao == atual){
+                if(strcmp(assam->orientacao, "Norte") == 0)
+                    printf(" ⮝  ");
+                else if(strcmp(assam->orientacao, "Leste") == 0)
+                    printf(" ⮞  ");
+                else if(strcmp(assam->orientacao, "Sul") == 0)
+                    printf(" ⮟  ");
+                else if(strcmp(assam->orientacao, "Oeste") == 0)
+                    printf(" ⮜  ");
+            }else if(atual->tapetes->tam != 0)
                 printf("  %d ", atual->tapetes->tam);
             else
                 printf("    ");
@@ -279,11 +290,41 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
             printf("+----");
         printf("+");
     }
-    printf("\n\nOrientacao atual: %s\n\n", assam->orientacao);
 }
 
-void imprimirJogadorAtual(Jogador *jogadorAtual){
-    printf("\nVez do jogador %s\nTapetes restantes: %d\nMoedas restantes: %d\n\n", jogadorAtual->cor, jogadorAtual->tapetes, jogadorAtual->dinheiro);
+void imprimirJogadorAtual(Jogador *jogadorAtual, Assam *assam){
+    int r, g, b;
+    if(strcmp(jogadorAtual->cor, "Vermelho") == 0){
+        r = 255;
+        g = 0;
+        b = 0;
+    }else if(strcmp(jogadorAtual->cor, "Azul") == 0){
+        r = 0;
+        g = 0;
+        b = 128;
+    }else if(strcmp(jogadorAtual->cor, "Amarelo") == 0){
+        r = 128;
+        g = 128;
+        b = 0;
+    }else if(strcmp(jogadorAtual->cor, "Verde") == 0){
+        r = 0;
+        g = 128;
+        b = 0;
+    }
+
+    printf("\n\n  ╔═══════════════════════════════════╗");
+    printf("\n  ║");
+    for(int i = 0; i < (35 - 15 - strlen(jogadorAtual->cor))/2; i++)
+        printf(" ");
+    printf("\x1b[38;2;%d;%d;%dmVez do jogador %s\x1b[0m", r, g, b, jogadorAtual->cor);
+    for(int i = 0; i < (36 - 15 - strlen(jogadorAtual->cor))/2; i++)
+        printf(" ");
+    printf("║");
+    printf("\n  ╠═══════════════════════════════════╣");
+    printf("\n  ║ \x1b[38;2;%d;%d;%dmMoedas restantes\x1b[0m: %-16d║", r, g, b, jogadorAtual->dinheiro);
+    printf("\n  ║ \x1b[38;2;%d;%d;%dmTapetes restantes\x1b[0m: %-15d║", r, g, b, jogadorAtual->tapetes);
+    printf("\n  ║ \x1b[38;2;%d;%d;%dmOrientação do Assam\x1b[0m: %-13s║", r, g, b, assam->orientacao);
+    printf("\n  ╚═══════════════════════════════════╝");
 }
 
 void avancarJogador(Jogador **jogadorAtual){
@@ -383,43 +424,43 @@ void moverAssam(Assam **assam, int resultado){
 }
 
 void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
-    char girarAssam, direcao;
-    printf("\nGirar assam?(S para sim e N para nao) ");
-    scanf("%c", &girarAssam);
+    int girarAssam, direcao;
+    printf("\n\n  >>>>>>>>>Rotacionar Assam?<<<<<<<<<\n  [0] Não\n  [1] Sim\n  Opção: ");
+    scanf("%d", &girarAssam);
     while(getchar() != '\n');
 
-    if(girarAssam != 's' && girarAssam != 'S' && girarAssam != 'n' && girarAssam != 'N'){
-        printf("\nDigite uma opcao valida: ");
+    if(girarAssam != 0 && girarAssam != 1){
+        printf("\n  Digite uma opção válida: ");
         do{
-            scanf("%c", &girarAssam);
+            scanf("%d", &girarAssam);
             while(getchar() != '\n');
-        }while(girarAssam != 's' && girarAssam != 'S' && girarAssam != 'n' && girarAssam != 'N');
+        }while(girarAssam != 0 && girarAssam != 1);
     }
 
-    if(girarAssam == 's' || girarAssam == 'S'){
-        printf("\nPara qual direcao?(D ou d para direita, E ou epara esuqerda) ");
-        scanf("%c", &direcao);
+    if(girarAssam == 1){
+        printf("\n  Em qual sentido?\n  [0] Anti horário\n  [1] Horário\nOpção: ");
+        scanf("%d", &direcao);
         while(getchar() != '\n');
 
-        if(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E'){
-            printf("\nDigite uma opcao valida: ");
+        if(girarAssam != 0 && girarAssam != 1){
+            printf("\n  Digite uma opção válida: ");
             do{
-                scanf("%c", &direcao);
+                scanf("%d", &direcao);
                 while(getchar() != '\n');
-            }while(direcao != 'd' && direcao != 'D' && direcao != 'e' && direcao != 'E');
+            }while(girarAssam != 0 && girarAssam != 1);
         }
 
-        if(direcao == 'D' || direcao == 'd')
-            girarAssamHorario(assam);
-        if(direcao == 'E' || direcao == 'e')
+        if(direcao == 0)
             girarAssamAntiHorario(assam);
+        if(direcao == 1)
+            girarAssamHorario(assam);
     }
-    printf("\nPressione enter para rolar o dado");
+    printf("\n  Pressione enter para rolar o dado");
     getchar();
-    printf("\nRolando dado...");
+    printf("\n  Rolando dado...");
     Sleep(1000);
     int resultado = (rand() % 6) / 2 + 1;
-    printf("\nResultado: %d\n", resultado);
+    printf("\n  Resultado: %d\n", resultado);
     
     moverAssam(assam, resultado);
     avancarJogador(jogadorAtual);
@@ -659,3 +700,18 @@ void condicaoVitoria(Tabuleiro *tabuleiro, Jogador *jogador) {
     }
 
 }
+
+/*
+int enableAnsiColors() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return 0;
+
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode)) return 0;
+
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if (!SetConsoleMode(hOut, dwMode)) return 0;
+
+    return 1;
+}
+*/
