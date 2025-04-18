@@ -6,10 +6,14 @@
 #include <ctype.h>
 #include "marrakech.h"
 
-typedef struct noPilha{
-    //int tapete; -> creio eu que eu preciso saber da cor do tapete que ta ali
-    int jogador;
+typedef struct tapete{
     char cor[10];
+    int numTap;
+    struct tapete *metade;
+}Tapete;
+
+typedef struct noPilha{
+    Tapete tapete;
     struct noPilha* prox;
 }NoPilha;
 
@@ -248,12 +252,13 @@ void girarAssamAntiHorario(Assam **assam){
 }
 
 void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
+    int r, g, b;
     Node *inicioLinha = *tabuleiro;
     Node *atual = NULL;
 
     printf("\n     ");
     for(int i = 0; i < TAM; i++)
-        printf("%c    ", i+65);
+        printf("%c    ", i + 65);
     printf("\n   ");
 
     for(int i = 0; i < TAM; i++)
@@ -261,26 +266,32 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     printf("+");
     for(int i = 0; i < TAM; i++){
         printf("\n");
-        if(i >= 9)
-            printf("%d ", i+1);
+        if(i < 9)
+            printf(" %d ", i + 1);
         else
-            printf(" %d ", i+1);
+        printf("%d ", i + 1);
         atual = inicioLinha;
         inicioLinha = inicioLinha->sul;
         for(int j = 0; j < TAM; j++){
             printf("|");
             if(assam->posicao == atual){
-                if(strcmp(assam->orientacao, "Norte") == 0)
-                    printf(" ⮝  ");
-                else if(strcmp(assam->orientacao, "Leste") == 0)
-                    printf(" ⮞  ");
-                else if(strcmp(assam->orientacao, "Sul") == 0)
-                    printf(" ⮟  ");
-                else if(strcmp(assam->orientacao, "Oeste") == 0)
-                    printf(" ⮜  ");
-            }else if(atual->tapetes->tam != 0)
-                printf("  %d ", atual->tapetes->tam);
-            else
+                if(atual->tapetes->topo != NULL)
+                    corRGB(atual->tapetes->topo->tapete.cor, &r, &g, &b);
+                else
+                    corRGB("", &r, &g, &b);
+                if(strcmp(assam->orientacao, "Norte") == 0){
+                    printf("\x1b[38;2;%d;%d;%dm \u2191  \x1b[0m", r, g, b);
+                }else if(strcmp(assam->orientacao, "Leste") == 0){
+                    printf("\x1b[38;2;%d;%d;%dm \u2192  \x1b[0m", r, g, b);
+                }else if(strcmp(assam->orientacao, "Sul") == 0){
+                    printf("\x1b[38;2;%d;%d;%dm \u2193  \x1b[0m", r, g, b);
+                }else if(strcmp(assam->orientacao, "Oeste") == 0){
+                    printf("\x1b[38;2;%d;%d;%dm \u2190  \x1b[0m", r, g, b);
+                }
+            }else if(atual->tapetes->tam != 0){
+                corRGB(atual->tapetes->topo->tapete.cor, &r, &g, &b);
+                printf("  \x1b[38;2;%d;%d;%dm%d \x1b[0m", r, g, b, atual->tapetes->topo->tapete.numTap);
+            }else
                 printf("    ");
             atual = atual->leste;
         }
@@ -294,23 +305,7 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
 
 void imprimirJogadorAtual(Jogador *jogadorAtual, Assam *assam){
     int r, g, b;
-    if(strcmp(jogadorAtual->cor, "Vermelho") == 0){
-        r = 255;
-        g = 0;
-        b = 0;
-    }else if(strcmp(jogadorAtual->cor, "Azul") == 0){
-        r = 0;
-        g = 0;
-        b = 128;
-    }else if(strcmp(jogadorAtual->cor, "Amarelo") == 0){
-        r = 128;
-        g = 128;
-        b = 0;
-    }else if(strcmp(jogadorAtual->cor, "Verde") == 0){
-        r = 0;
-        g = 128;
-        b = 0;
-    }
+    corRGB(jogadorAtual->cor, &r, &g, &b);
 
     printf("\n\n  ╔═══════════════════════════════════╗");
     printf("\n  ║");
@@ -424,8 +419,10 @@ void moverAssam(Assam **assam, int resultado){
 }
 
 void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
-    int girarAssam, direcao;
-    printf("\n\n  >>>>>>>>>Rotacionar Assam?<<<<<<<<<\n  [0] Não\n  [1] Sim\n  Opção: ");
+    int girarAssam, direcao, r, g, b;
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
+    printf("\n\n  >>>>>>>>>\x1b[38;2;%d;%d;%dmRotacionar Assam?\x1b[0m<<<<<<<<<\n", r, g, b);
+    printf("  [0] \x1b[38;2;%d;%d;%dmNão\x1b[0m\n  [1] \x1b[38;2;%d;%d;%dmSim\n  Opção\x1b[0m: ", r, g, b, r, g, b);
     scanf("%d", &girarAssam);
     while(getchar() != '\n');
 
@@ -438,7 +435,9 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     }
 
     if(girarAssam == 1){
-        printf("\n  Em qual sentido?\n  [0] Anti horário\n  [1] Horário\nOpção: ");
+        printf("\n  >>>>>>>>>\x1b[38;2;%d;%d;%dmEm qual sentido?\x1b[0m<<<<<<<<<", r, g, b);
+        printf("\n  [0] \x1b[38;2;%d;%d;%dmAnti horário\x1b[0m\n  [1] \x1b[38;2;%d;%d;%dmHorário\x1b[0m", r, g, b, r, g, b);
+        printf("\n  \x1b[38;2;%d;%d;%dmOpção\x1b[0m: ", r, g, b);
         scanf("%d", &direcao);
         while(getchar() != '\n');
 
@@ -455,18 +454,34 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
         if(direcao == 1)
             girarAssamHorario(assam);
     }
-    printf("\n  Pressione enter para rolar o dado");
+    system("cls");
+    imprimirTabuleiro(tabuleiro, *assam);
+    imprimirJogadorAtual(*jogadorAtual, *assam);
+    printf("\n\n  Pressione enter para rolar o dado");
     getchar();
     printf("\n  Rolando dado...");
-    Sleep(1000);
+    Sleep(800);
     int resultado = (rand() % 6) / 2 + 1;
     printf("\n  Resultado: %d\n", resultado);
-    
-    moverAssam(assam, resultado);
+    Sleep(600);
+    for(int i = 0; i < resultado; i++){
+        system("cls");
+        printf("\n  Rolando dado...");
+        printf("\n  Resultado: %d\n", resultado);
+        moverAssam(assam, 1);
+        imprimirTabuleiro(tabuleiro, *assam);
+        Sleep(600);
+    }
+    imprimirJogadorAtual(*jogadorAtual, *assam);
+    if((*assam)->posicao->tapetes->topo != NULL){
+        pagarJogador(*assam, jogadorAtual);
+    }
+    colocarTapete(tabuleiro, assam, jogadorAtual);
+    system("cls");
     avancarJogador(jogadorAtual);
 }
 
-void inserirNaPilha(char cor[10], Node *node){
+void inserirNaPilha(char cor[], Node *node, Jogador *jogador){
     if(node == NULL || cor == NULL){
         return;
     }
@@ -476,10 +491,10 @@ void inserirNaPilha(char cor[10], Node *node){
         return;
     }
 
-    novo->jogador = 0;
-    strcpy(novo->cor, cor);
+    strcpy(novo->tapete.cor, cor);
+    novo->tapete.numTap = 12 - jogador->tapetes + 1;
 
-    if(node->tapetes->tam == 0){
+    if(node->tapetes->topo == NULL){
         node->tapetes->topo = novo;
         novo->prox = NULL;
     }else{
@@ -606,10 +621,12 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
             continue;
         }
     
-        inserirNaPilha((*jogador)->cor, tap1);
-        inserirNaPilha((*jogador)->cor, tap2);
-        tap1->tapetes->topo->prox = tap2->tapetes->topo;
-        tap2->tapetes->topo->prox = tap1->tapetes->topo;
+        inserirNaPilha((*jogador)->cor, tap1, *jogador);
+        inserirNaPilha((*jogador)->cor, tap2, *jogador);
+        tap1->tapetes->topo->tapete.metade = &(tap2->tapetes->topo->tapete);
+        tap2->tapetes->topo->tapete.metade = &(tap1->tapetes->topo->tapete);
+        tap1->tapetes->tam++;
+        tap2->tapetes->tam++;
 
         break;
     }
@@ -617,20 +634,119 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
     (*jogador)->tapetes--;
 }
 
-int areaTapete(Assam **assam) {
-    if((*assam)->posicao->tapetes->topo == NULL) return 0;
-    return (*assam)->posicao->tapetes->tam;
+void areaTapete(Node *espacoAtual, Topo *tapAdj){
+    NoPilha *novo = (NoPilha*)malloc(sizeof(NoPilha));
+    strcpy(novo->tapete.cor, espacoAtual->tapetes->topo->tapete.cor);
+    novo->tapete.metade = espacoAtual->tapetes->topo->tapete.metade;
+    novo->tapete.numTap = espacoAtual->tapetes->topo->tapete.numTap;
+    if(tapAdj->topo == NULL){
+        tapAdj->topo = novo;
+        novo->prox = NULL;
+    }else{
+        novo->prox = tapAdj->topo;
+        tapAdj->topo = novo;
+    }
+    tapAdj->tam++;
+    NoPilha *aux, *atual;
+    if(espacoAtual->norte->tapetes->topo != NULL){
+        if(strcmp(espacoAtual->tapetes->topo->tapete.cor, espacoAtual->norte->tapetes->topo->tapete.cor) == 0){
+            aux = espacoAtual->norte->tapetes->topo;
+            atual = tapAdj->topo;
+            while(atual != NULL){
+                if(atual->tapete.metade != aux->tapete.metade)
+                    atual = atual->prox;
+                else
+                    break;
+            }
+            if(atual == NULL)
+                areaTapete(espacoAtual->norte, tapAdj);
+        }
+    }
+    if(espacoAtual->leste->tapetes->topo != NULL){
+        if(strcmp(espacoAtual->tapetes->topo->tapete.cor, espacoAtual->leste->tapetes->topo->tapete.cor) == 0){
+            aux = espacoAtual->leste->tapetes->topo;
+            atual = tapAdj->topo;
+            while(atual != NULL){
+                if(atual->tapete.metade != aux->tapete.metade)
+                    atual = atual->prox;
+                else
+                    break;
+            }
+            if(atual == NULL){
+                areaTapete(espacoAtual->leste, tapAdj);
+            }
+        }
+    }
+    if(espacoAtual->sul->tapetes->topo != NULL){
+        if(strcmp(espacoAtual->tapetes->topo->tapete.cor, espacoAtual->sul->tapetes->topo->tapete.cor) == 0){
+            aux = espacoAtual->sul->tapetes->topo;
+            atual = tapAdj->topo;
+            while(atual != NULL){
+                if(atual->tapete.metade != aux->tapete.metade)
+                    atual = atual->prox;
+                else
+                    break;
+            }
+            if(atual == NULL)
+                areaTapete(espacoAtual->sul, tapAdj);
+        }
+    }
+    if(espacoAtual->oeste->tapetes->topo != NULL){
+        if(strcmp(espacoAtual->tapetes->topo->tapete.cor, espacoAtual->oeste->tapetes->topo->tapete.cor) == 0){
+            aux = espacoAtual->oeste->tapetes->topo;
+            atual = tapAdj->topo;
+            while(atual != NULL){
+                if(atual->tapete.metade != aux->tapete.metade)
+                    atual = atual->prox;
+                else
+                    break;
+            }
+            if(atual == NULL)
+                areaTapete(espacoAtual->oeste, tapAdj);
+        }
+    }
 }
 
-int pagarJogador(Assam **assam, Jogador **jogador) {
-    int area = areaTapete(assam);
+void pagarJogador(Assam *assam, Jogador **jogadorAtual) {
+    int r, g, b;
+    Jogador *donoTapete = *jogadorAtual;
+    while(strcmp(donoTapete->cor, assam->posicao->tapetes->topo->tapete.cor) != 0)
+        donoTapete = donoTapete->prox;
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
+    printf("\n\n  O \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m pisou em cima do tapete do ", r, g, b, (*jogadorAtual)->cor);
+    corRGB(assam->posicao->tapetes->topo->tapete.cor, &r, &g, &b);
+    printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m... hora de pagar o preço", r, g, b, donoTapete->cor);
 
-    Jogador *aux = (*jogador);
-    while(strcmp(aux->cor, (*assam)->posicao->tapetes->topo->cor) != 0) {
-        aux = aux->prox;
+    Topo *tapAdj = criarPilhaTapetes();
+    areaTapete(assam->posicao, tapAdj);
+    int moedas = tapAdj->tam;
+    NoPilha *aux, *atual = tapAdj->topo;
+    tapAdj->topo = NULL;
+    free(tapAdj);
+    while(atual != NULL){
+        aux = atual;
+        atual = atual->prox;
+        free(aux);
     }
-    aux->dinheiro += area;
-    return area;
+
+    printf("\n  Calculando quantas moedas devem ser pagas");
+    for(int i = 0; i < 3; i++){
+        Sleep(500);
+        printf(".");
+    }
+    printf(" Pronto");
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
+    printf("\n  Transferindo %d moedas do \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m para o ", moedas, r, g, b, (*jogadorAtual)->cor);
+    corRGB(donoTapete->cor, &r, &g, &b);
+    printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m", r, g, b, donoTapete->cor);
+    (*jogadorAtual)->dinheiro -= moedas;
+    donoTapete->dinheiro += moedas;
+    for(int i = 0; i < 3; i++){
+        Sleep(500);
+        printf(".");
+    }
+    printf(" Pronto");
+
 }
 
 int continuarJogadondo(Jogador **jogador) {
@@ -701,17 +817,27 @@ void condicaoVitoria(Tabuleiro *tabuleiro, Jogador *jogador) {
 
 }
 
-/*
-int enableAnsiColors() {
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE) return 0;
-
-    DWORD dwMode = 0;
-    if (!GetConsoleMode(hOut, &dwMode)) return 0;
-
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    if (!SetConsoleMode(hOut, dwMode)) return 0;
-
-    return 1;
+void corRGB(char cor[], int *r, int *g, int *b){
+    if(strcmp(cor, "Vermelho") == 0){
+        *r = 255;
+        *g = 0;
+        *b = 0;
+    }else if(strcmp(cor, "Azul") == 0){
+        *r = 0;
+        *g = 0;
+        *b = 255;
+    }else if(strcmp(cor, "Amarelo") == 0){
+        *r = 255;
+        *g = 255;
+        *b = 0;
+    }else if(strcmp(cor, "Verde") == 0){
+        *r = 0;
+        *g = 255;
+        *b = 0;
+    }else{
+        *r = 255;
+        *g = 255;
+        *b = 255;
+    }
 }
-*/
+
