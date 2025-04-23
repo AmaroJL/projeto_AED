@@ -27,7 +27,6 @@ int nodeEastIsExist(Assam **);
 int nodeWestIsExist(Assam **);
 void colocarTapete(Tabuleiro*, Assam**, Jogador**);
 void pagarJogador(Assam*, Jogador**);
-int continuarJogadondo(Jogador**);
 int FimDeJogo(Jogador*);
 void condicaoVitoria(Tabuleiro*, Jogador*);
 void corRGB(char[], int *, int *, int *);

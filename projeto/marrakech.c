@@ -610,7 +610,7 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
             printf("\nO tapete deve ser colocado em duas posicoes adjacentes. Tente novamente:");
             continue;
         }
-        if(tap1->tapetes->topo != NULL) {
+        if(tap1->tapetes->topo != NULL && tap2->tapetes->topo != NULL) {
             if(tap1->tapetes->topo->prox == tap2->tapetes->topo && tap2->tapetes->topo->prox == tap1->tapetes->topo) {
                 printf("\nO tapete nao pode cobrir totalmete outro tapete. Tente novamente:");
                 continue;
@@ -625,8 +625,6 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
         inserirNaPilha((*jogador)->cor, tap2, *jogador);
         tap1->tapetes->topo->tapete.metade = &(tap2->tapetes->topo->tapete);
         tap2->tapetes->topo->tapete.metade = &(tap1->tapetes->topo->tapete);
-        tap1->tapetes->tam++;
-        tap2->tapetes->tam++;
 
         break;
     }
@@ -747,23 +745,6 @@ void pagarJogador(Assam *assam, Jogador **jogadorAtual) {
     }
     printf(" Pronto");
 
-}
-
-int continuarJogadondo(Jogador **jogador) {
-    if((*jogador)->dinheiro <= 0) {
-        Jogador *aux = (*jogador)->prox;
-        Jogador *ant = (*jogador);
-        while(aux != (*jogador)) {
-            ant = aux;
-            aux = aux->prox;
-        }
-        ant->prox = aux->prox;
-        printf("Jogador %s esta fora\n", (*jogador)->cor);
-        (*jogador) = (*jogador)->prox;
-        free(aux);
-        return 1;
-    }
-    return 0;
 }
 
 int FimDeJogo(Jogador *jogador) {
