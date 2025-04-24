@@ -290,7 +290,10 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
                 }
             }else if(atual->tapetes->tam != 0){
                 corRGB(atual->tapetes->topo->tapete.cor, &r, &g, &b);
-                printf("  \x1b[38;2;%d;%d;%dm%d \x1b[0m", r, g, b, atual->tapetes->topo->tapete.numTap);
+                if(atual->tapetes->topo->tapete.numTap < 10)
+                    printf("  \x1b[38;2;%d;%d;%dm%d \x1b[0m", r, g, b, atual->tapetes->topo->tapete.numTap);
+                else
+                printf(" \x1b[38;2;%d;%d;%dm%d \x1b[0m", r, g, b, atual->tapetes->topo->tapete.numTap);
             }else
                 printf("    ");
             atual = atual->leste;
@@ -473,8 +476,9 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
         Sleep(600);
     }
     imprimirJogadorAtual(*jogadorAtual, *assam);
-    if((*assam)->posicao->tapetes->topo != NULL){
-        pagarJogador(*assam, jogadorAtual);
+    if((*assam)->posicao->tapetes->tam != 0){
+        if(strcmp((*assam)->posicao->tapetes->topo->tapete.cor, (*jogadorAtual)->cor) != 0)
+            pagarJogador(*assam, jogadorAtual);
     }
     colocarTapete(tabuleiro, assam, jogadorAtual);
     system("cls");
@@ -534,26 +538,27 @@ int nodeEastIsExist(Assam **assam){
     }
 }
 
-void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
-    int l1, l2;
+void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual) {
+    int l1, l2, r, g, b;
     char c1, c2;
     Node *auxL = *tabuleiro;
     Node *auxC, *tap1, *tap2;
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
     while(1) {
-        printf("\nEscolha da primeira coordenada:\n(Linha, Coluna): ");
+        printf("\n  Escolha da \x1b[38;2;%d;%d;%dmprimeira coordenada\x1b[0m:\n  (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
         scanf(" %d%c", &l1, &c1);
         c1 = toupper(c1);
         if((l1 < 1 || l1 > TAM) || (c1-64 < 1 || c1-64 > TAM)) {
-            printf("Coordenadas informadas invalidas. Tente novamente.\n");
+            printf("  Coordenadas informadas invalidas. Tente novamente.\n");
             continue;
         }
 
         while(1) {
-            printf("\nEscolha da segunda coordenada:\n(Linha, Coluna): ");
+            printf("\n  Escolha da \x1b[38;2;%d;%d;%dmsegunda coordenada\x1b[0m:\n  (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
             scanf(" %d%c", &l2, &c2);
             c2 = toupper(c2);
             if((l2 < 1 || l2 > TAM) || (c2-64 < 1 || c2-64 > TAM)) {
-                printf("Coordenadas informadas invalidas. Tente novamente.\n");
+                printf("  Coordenadas informadas invalidas. Tente novamente.\n");
                 continue;
             }
 
@@ -610,15 +615,15 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
             continue;
         }
     
-        inserirNaPilha((*jogador)->cor, tap1, *jogador);
-        inserirNaPilha((*jogador)->cor, tap2, *jogador);
+        inserirNaPilha((*jogadorAtual)->cor, tap1, *jogadorAtual);
+        inserirNaPilha((*jogadorAtual)->cor, tap2, *jogadorAtual);
         tap1->tapetes->topo->tapete.metade = &(tap2->tapetes->topo->tapete);
         tap2->tapetes->topo->tapete.metade = &(tap1->tapetes->topo->tapete);
 
         break;
     }
     
-    (*jogador)->tapetes--;
+    (*jogadorAtual)->tapetes--;
 }
 
 void areaTapete(Node *espacoAtual, Topo *tapAdj){
