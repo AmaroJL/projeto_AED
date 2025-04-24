@@ -540,38 +540,27 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
     Node *auxL = *tabuleiro;
     Node *auxC, *tap1, *tap2;
     while(1) {
-        printf("\nEscolha da primeira coordenada:\nLinha: ");
-        scanf(" %d", &l1);
-        while(l1 < 1 || l1 > TAM) {
-            printf("Informe uma linha valida: ");
-            getchar();
-            scanf(" %d", &l1);
-        }
-        printf("Coluna: ");
-        scanf(" %c", &c1);
+        printf("\nEscolha da primeira coordenada:\n(Linha, Coluna): ");
+        scanf(" %d%c", &l1, &c1);
         c1 = toupper(c1);
-        while(c1-64 < 1 || c1-64 > TAM) {
-            printf("Informe uma coluna valida: ");
-            getchar();
-            scanf(" %c", &c1);
+        if((l1 < 1 || l1 > TAM) || (c1-64 < 1 || c1-64 > TAM)) {
+            printf("Coordenadas informadas invalidas. Tente novamente.\n");
+            continue;
         }
-        printf("\nEscolha da segunda coordenada:\nLinha: ");
-        scanf(" %d", &l2);
-        while(l2 < 1 || l2 > TAM) {
-            printf("Informe uma linha valida: ");
-            getchar();
-            scanf(" %d", &l2);
-        }
-        printf("Coluna: ");
-        scanf(" %c", &c2);
-        c2 = toupper(c2);
-        while(c2-64 < 1 || c2-64 > TAM) {
-            printf("Informe uma coluna valida: ");
-            getchar();
-            scanf(" %c", &c2);
-        } 
-        while(getchar() != '\n');
 
+        while(1) {
+            printf("\nEscolha da segunda coordenada:\n(Linha, Coluna): ");
+            scanf(" %d%c", &l2, &c2);
+            c2 = toupper(c2);
+            if((l2 < 1 || l2 > TAM) || (c2-64 < 1 || c2-64 > TAM)) {
+                printf("Coordenadas informadas invalidas. Tente novamente.\n");
+                continue;
+            }
+
+            break;           
+        }
+
+        while(getchar() != '\n');
 
         auxL = *tabuleiro;
         for(int i=1; i<=TAM; i++) {
@@ -610,8 +599,8 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogador) {
             printf("\nO tapete deve ser colocado em duas posicoes adjacentes. Tente novamente:");
             continue;
         }
-        if(tap1->tapetes->topo != NULL && tap2->tapetes->topo != NULL) {
-            if(tap1->tapetes->topo->prox == tap2->tapetes->topo && tap2->tapetes->topo->prox == tap1->tapetes->topo) {
+        if(tap1->tapetes->topo != NULL) {
+            if(tap1->tapetes->topo->tapete.metade == &(tap2->tapetes->topo->tapete) && tap2->tapetes->topo->tapete.metade == &(tap1->tapetes->topo->tapete)) {
                 printf("\nO tapete nao pode cobrir totalmete outro tapete. Tente novamente:");
                 continue;
             } 
