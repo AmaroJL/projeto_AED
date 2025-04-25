@@ -254,12 +254,20 @@ void girarAssamAntiHorario(Assam **assam){
 void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     int r, g, b;
     Node *inicioLinha = *tabuleiro;
-    Node *atual = NULL;
+    Node *atual = inicioLinha;
 
-    printf("\n     ");
+    printf("\n       ");
     for(int i = 0; i < TAM; i++)
         printf("%c    ", i + 65);
     printf("\n   ");
+    for(int i = 0; i < TAM; i++){
+        if(atual->norte == atual->oeste)
+            printf("    \u2190");
+        else if(atual->norte == atual->leste)
+            printf("    \u2192");
+        atual = atual->leste;
+    }
+    printf("\n     ");
 
     for(int i = 0; i < TAM; i++)
         printf("+----");
@@ -269,9 +277,13 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
         if(i < 9)
             printf(" %d ", i + 1);
         else
-        printf("%d ", i + 1);
+            printf("%d ", i + 1);
         atual = inicioLinha;
         inicioLinha = inicioLinha->sul;
+        if(atual->oeste == atual->norte)
+            printf("\u2191 ");
+        else if(atual->oeste == atual->sul)
+            printf("\u2193 ");
         for(int j = 0; j < TAM; j++){
             printf("|");
             if(assam->posicao == atual){
@@ -298,11 +310,25 @@ void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
                 printf("    ");
             atual = atual->leste;
         }
+        atual = atual->leste;
         printf("|");
-        printf("\n   ");
+        if(atual->leste == atual->norte)
+            printf(" \u2191");
+        else if(atual->leste == atual->sul)
+            printf(" \u2193");
+        printf("\n     ");
         for(int i = 0; i < TAM; i++)
             printf("+----");
         printf("+");
+    }
+    printf("\n   ");
+    atual = inicioLinha;
+    for(int i = 0; i < TAM; i++){
+        if(atual->sul == atual->leste)
+            printf("    \u2192");
+        else if(atual->sul == atual->oeste)
+            printf("    \u2190");
+        atual = atual->leste;
     }
 }
 
