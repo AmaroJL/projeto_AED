@@ -20,50 +20,48 @@ typedef struct noPilha{
 typedef struct{
     int tam;
     NoPilha* topo;
-}Topo;
+}Pilha;
 
-typedef struct node{
-    Topo* tapetes;
-    struct node* norte;
-    struct node* sul;
-    struct node* leste;
-    struct node* oeste;
-}Node;
+typedef struct espaco{
+    Pilha* tapetes;
+    struct espaco* norte;
+    struct espaco* sul;
+    struct espaco* leste;
+    struct espaco* oeste;
+}Espaco;
 
 typedef struct assam{
     int linha;
     int coluna;
     char orientacao[6];
-    Node* posicao;
+    Espaco* posicao;
 }Assam;
 
 typedef struct jogador{
     int dinheiro;
     int tapetes;
+    int jogando;
     char cor[10];
     struct jogador *prox;
 }Jogador;
 
-typedef Node* Tabuleiro;
-typedef Jogador* listaJogadores;
+Pilha* criarPilhaTapetes(){
+    Pilha* novaPilha = (Pilha*)malloc(sizeof(Pilha));
+    novaPilha->tam = 0;
+    novaPilha->topo = NULL;
 
-Topo* criarPilhaTapetes(){
-    Topo* novoTopo = (Topo*)malloc(sizeof(Topo));
-    novoTopo->tam = 0;
-    novoTopo->topo = NULL;
-
-    return novoTopo;
+    return novaPilha;
 }
 
-Node* criarNo(){
-    Node* novoNo = (Node*)malloc(sizeof(Node));
-    novoNo->norte = NULL;
-    novoNo->sul = NULL;
-    novoNo->leste = NULL;
-    novoNo->oeste = NULL;
-    novoNo->tapetes = criarPilhaTapetes();
+Espaco* criarEspaco(){
+    Espaco* novoEspaco = (Espaco*)malloc(sizeof(Espaco));
+    novoEspaco->norte = NULL;
+    novoEspaco->sul = NULL;
+    novoEspaco->leste = NULL;
+    novoEspaco->oeste = NULL;
+    novoEspaco->tapetes = criarPilhaTapetes();
 
-    return novoNo;
+    return novoEspaco;
 }
 
 Assam* inicializarAssam(Tabuleiro *tabuleiro){
@@ -83,7 +81,7 @@ Assam* inicializarAssam(Tabuleiro *tabuleiro){
     else if(or == 3)
         strcpy(novoAssam->orientacao, "Oeste");
 
-    Node *atual = *tabuleiro;
+    Espaco *atual = *tabuleiro;
     for(int i = 1; i < (TAM + 1)/2; i++){
         atual = atual->leste;
         atual = atual->sul;
@@ -95,40 +93,40 @@ Assam* inicializarAssam(Tabuleiro *tabuleiro){
 
 Tabuleiro* criar(){
     Tabuleiro* tabuleiro = (Tabuleiro*)malloc(sizeof(Tabuleiro));
-    Node* anterior = NULL;
-    Node* linhaAnterior = NULL;
-    Node* inicioLinhaAnterior = NULL;
-    Node* inicioLinhaAtual = NULL;
+    Espaco* anterior = NULL;
+    Espaco* linhaAnterior = NULL;
+    Espaco* inicioLinhaAnterior = NULL;
+    Espaco* inicioLinhaAtual = NULL;
 
     for(int i = 0; i < TAM; i++){
         for(int j = 0; j < TAM; j++){
-            Node* novoNo = criarNo();
+            Espaco* novoEspaco = criarEspaco();
             if(i == 0 && j == 0){
-                *tabuleiro = novoNo;
+                *tabuleiro = novoEspaco;
             }
 
             if(j > 0){
-                anterior->leste = novoNo;
-                novoNo->oeste = anterior;
+                anterior->leste = novoEspaco;
+                novoEspaco->oeste = anterior;
             }
             
             if(i > 0){
-                novoNo->norte = linhaAnterior;
-                linhaAnterior->sul = novoNo;
+                novoEspaco->norte = linhaAnterior;
+                linhaAnterior->sul = novoEspaco;
                 linhaAnterior = linhaAnterior->leste;
             }
 
-            novoNo->tapetes = criarPilhaTapetes();
+            novoEspaco->tapetes = criarPilhaTapetes();
 
             if(j == 0)
-                inicioLinhaAtual = novoNo;
-            anterior = novoNo;
+                inicioLinhaAtual = novoEspaco;
+            anterior = novoEspaco;
         }
         inicioLinhaAnterior = inicioLinhaAtual;
         linhaAnterior = inicioLinhaAnterior;
     }
 
-    Node* atual = *tabuleiro;
+    Espaco *atual = *tabuleiro;
     while(atual->leste != NULL){
         if(atual->norte == NULL){
             atual->norte = atual->leste;
@@ -204,23 +202,63 @@ Jogador* criarJogador(){
 }
 
 listaJogadores* inicializarJogadores(){
+    int qtd;
+    printf(" Quantos jogadores jogarão? (2-4): ");
+    scanf("%d", &qtd);
+    while(qtd < 2 || qtd > 4){
+        system("cls");
+        fflush(stdin);
+        printf(" Escolha uma opção válida: ");
+        scanf("%d", &qtd);
+    }
+
     listaJogadores *novosJogadores = (listaJogadores*)malloc(sizeof(listaJogadores));
 
     Jogador *jogador1 = criarJogador();
     Jogador *jogador2 = criarJogador();
-    Jogador *jogador3 = criarJogador();
-    Jogador *jogador4 = criarJogador();
+
+    if(qtd == 2){
+        strcpy(jogador1->cor, "Vermelho");
+        strcpy(jogador2->cor, "Azul");
+
+        jogador1->jogando = 1;
+        jogador2->jogando = 1;
     
-    strcpy(jogador1->cor, "Vermelho");
-    strcpy(jogador2->cor, "Azul");
-    strcpy(jogador3->cor, "Amarelo");
-    strcpy(jogador4->cor, "Verde");
+        jogador1->prox = jogador2;
+        jogador2->prox = jogador1;  
+    }else if(qtd == 3){
+        Jogador *jogador3 = criarJogador();
+
+        strcpy(jogador1->cor, "Vermelho");
+        strcpy(jogador2->cor, "Azul");
+        strcpy(jogador3->cor, "Amarelo");
+
+        jogador1->jogando = 1;
+        jogador2->jogando = 1;
+        jogador3->jogando = 1;
+
+        jogador1->prox = jogador2;
+        jogador2->prox = jogador3;
+        jogador3->prox = jogador1;
+    }else if(qtd == 4){
+        Jogador *jogador3 = criarJogador();
+        Jogador *jogador4 = criarJogador();
     
-    
-    jogador1->prox = jogador2;
-    jogador2->prox = jogador3;
-    jogador3->prox = jogador4;
-    jogador4->prox = jogador1;
+        strcpy(jogador1->cor, "Vermelho");
+        strcpy(jogador2->cor, "Azul");
+        strcpy(jogador3->cor, "Amarelo");
+        strcpy(jogador4->cor, "Verde");
+        
+        jogador1->jogando = 1;
+        jogador2->jogando = 1;
+        jogador3->jogando = 1;
+        jogador4->jogando = 1;
+        
+        jogador1->prox = jogador2;
+        jogador2->prox = jogador3;
+        jogador3->prox = jogador4;
+        jogador4->prox = jogador1;
+    }
 
     *novosJogadores = jogador1;
 
@@ -253,8 +291,8 @@ void girarAssamAntiHorario(Assam **assam){
 
 void imprimirTabuleiro(Tabuleiro* tabuleiro, Assam* assam){
     int r, g, b;
-    Node *inicioLinha = *tabuleiro;
-    Node *atual = inicioLinha;
+    Espaco *inicioLinha = *tabuleiro;
+    Espaco *atual = inicioLinha;
 
     printf("\n       ");
     for(int i = 0; i < TAM; i++)
@@ -336,23 +374,25 @@ void imprimirJogadorAtual(Jogador *jogadorAtual, Assam *assam){
     int r, g, b;
     corRGB(jogadorAtual->cor, &r, &g, &b);
 
-    printf("\n\n  ╔═══════════════════════════════════╗");
-    printf("\n  ║");
+    printf("\n\n    ╔═══════════════════════════════════╗");
+    printf("\n    ║");
     for(int i = 0; i < (35 - 15 - strlen(jogadorAtual->cor))/2; i++)
         printf(" ");
     printf("\x1b[38;2;%d;%d;%dmVez do jogador %s\x1b[0m", r, g, b, jogadorAtual->cor);
     for(int i = 0; i < (36 - 15 - strlen(jogadorAtual->cor))/2; i++)
         printf(" ");
     printf("║");
-    printf("\n  ╠═══════════════════════════════════╣");
-    printf("\n  ║ \x1b[38;2;%d;%d;%dmMoedas restantes\x1b[0m: %-16d║", r, g, b, jogadorAtual->dinheiro);
-    printf("\n  ║ \x1b[38;2;%d;%d;%dmTapetes restantes\x1b[0m: %-15d║", r, g, b, jogadorAtual->tapetes);
-    printf("\n  ║ \x1b[38;2;%d;%d;%dmOrientação do Assam\x1b[0m: %-13s║", r, g, b, assam->orientacao);
-    printf("\n  ╚═══════════════════════════════════╝");
+    printf("\n    ╠═══════════════════════════════════╣");
+    printf("\n    ║ \x1b[38;2;%d;%d;%dmMoedas restantes\x1b[0m: %-16d║", r, g, b, jogadorAtual->dinheiro);
+    printf("\n    ║ \x1b[38;2;%d;%d;%dmTapetes restantes\x1b[0m: %-15d║", r, g, b, jogadorAtual->tapetes);
+    printf("\n    ║ \x1b[38;2;%d;%d;%dmOrientação do Assam\x1b[0m: %-13s║", r, g, b, assam->orientacao);
+    printf("\n    ╚═══════════════════════════════════╝");
 }
 
 void avancarJogador(Jogador **jogadorAtual){
-    *jogadorAtual = (*jogadorAtual)->prox;
+    do{
+        *jogadorAtual = (*jogadorAtual)->prox;
+    }while((*jogadorAtual)->jogando == 0);
 }
 
 void moverAssam(Assam **assam, int resultado){
@@ -450,30 +490,32 @@ void moverAssam(Assam **assam, int resultado){
 void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
     int girarAssam, direcao, r, g, b;
     corRGB((*jogadorAtual)->cor, &r, &g, &b);
-    printf("\n\n  >>>>>>>>>\x1b[38;2;%d;%d;%dmRotacionar Assam?\x1b[0m<<<<<<<<<\n", r, g, b);
-    printf("  [0] \x1b[38;2;%d;%d;%dmNão\x1b[0m\n  [1] \x1b[38;2;%d;%d;%dmSim\n  Opção\x1b[0m: ", r, g, b, r, g, b);
+    printf("\n\n    >>>>>>>>>\x1b[38;2;%d;%d;%dmRotacionar Assam?\x1b[0m<<<<<<<<<\n", r, g, b);
+    printf("    [0] \x1b[38;2;%d;%d;%dmNão\x1b[0m\n    [1] \x1b[38;2;%d;%d;%dmSim\n    Opção\x1b[0m: ", r, g, b, r, g, b);
     scanf("%d", &girarAssam);
     while(getchar() != '\n');
 
     if(girarAssam != 0 && girarAssam != 1){
-        printf("\n  Digite uma opção válida: ");
+        printf("\n    Digite uma opção válida: ");
         do{
-            scanf("%d", &girarAssam);
+            fflush(stdin);
+            scanf("  %d", &girarAssam);
             while(getchar() != '\n');
         }while(girarAssam != 0 && girarAssam != 1);
     }
 
     if(girarAssam == 1){
-        printf("\n  >>>>>>>>>\x1b[38;2;%d;%d;%dmEm qual sentido?\x1b[0m<<<<<<<<<", r, g, b);
-        printf("\n  [0] \x1b[38;2;%d;%d;%dmAnti horário\x1b[0m\n  [1] \x1b[38;2;%d;%d;%dmHorário\x1b[0m", r, g, b, r, g, b);
-        printf("\n  \x1b[38;2;%d;%d;%dmOpção\x1b[0m: ", r, g, b);
+        printf("\n    >>>>>>>>>\x1b[38;2;%d;%d;%dmEm qual sentido?\x1b[0m<<<<<<<<<", r, g, b);
+        printf("\n    [0] \x1b[38;2;%d;%d;%dmAnti horário\x1b[0m\n    [1] \x1b[38;2;%d;%d;%dmHorário\x1b[0m", r, g, b, r, g, b);
+        printf("\n    \x1b[38;2;%d;%d;%dmOpção\x1b[0m: ", r, g, b);
         scanf("%d", &direcao);
         while(getchar() != '\n');
 
         if(girarAssam != 0 && girarAssam != 1){
-            printf("\n  Digite uma opção válida: ");
+            printf("\n    Digite uma opção válida: ");
             do{
-                scanf("%d", &direcao);
+                fflush(stdin);
+                scanf("  %d", &direcao);
                 while(getchar() != '\n');
             }while(girarAssam != 0 && girarAssam != 1);
         }
@@ -483,36 +525,46 @@ void fazerJogada(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual){
         if(direcao == 1)
             girarAssamHorario(assam);
     }
+
     system("cls");
     imprimirTabuleiro(tabuleiro, *assam);
     imprimirJogadorAtual(*jogadorAtual, *assam);
-    printf("\n\n  Pressione enter para rolar o dado");
+    printf("\n\n    Pressione enter para rolar o dado");
     getchar();
-    printf("\n  Rolando dado...");
+    printf("\n    Rolando dado...");
     Sleep(800);
-    int resultado = (rand() % 6) / 2 + 1;
-    printf("\n  Resultado: %d\n", resultado);
+
+    int resultado = rand() % 6;
+    if(resultado == 0)
+        resultado = 1;
+    else if(resultado == 1 || resultado == 2)
+        resultado = 2;
+    else if(resultado == 3 || resultado == 4)
+        resultado = 3;
+    else
+        resultado = 4;
+
+    printf("\n    Resultado: %d\n", resultado);
     Sleep(600);
     for(int i = 0; i < resultado; i++){
         system("cls");
-        printf("\n  Rolando dado...");
-        printf("\n  Resultado: %d\n", resultado);
+        printf("\n    Rolando dado...");
+        printf("\n    Resultado: %d\n", resultado);
         moverAssam(assam, 1);
         imprimirTabuleiro(tabuleiro, *assam);
         Sleep(600);
     }
+    
     imprimirJogadorAtual(*jogadorAtual, *assam);
-    if((*assam)->posicao->tapetes->tam != 0){
-        if(strcmp((*assam)->posicao->tapetes->topo->tapete.cor, (*jogadorAtual)->cor) != 0)
-            pagarJogador(*assam, jogadorAtual);
-    }
+    pagarJogador(tabuleiro, *assam, jogadorAtual);
+
     colocarTapete(tabuleiro, assam, jogadorAtual);
     system("cls");
     avancarJogador(jogadorAtual);
 }
 
-void inserirNaPilha(char cor[], Node *node, Jogador *jogador){
-    if(node == NULL || cor == NULL){
+void inserirNaPilha(char cor[], Espaco *espaco, Jogador *jogador){
+    if(espaco == NULL || cor == NULL){
         return;
     }
     
@@ -524,15 +576,15 @@ void inserirNaPilha(char cor[], Node *node, Jogador *jogador){
     strcpy(novo->tapete.cor, cor);
     novo->tapete.numTap = 12 - jogador->tapetes + 1;
 
-    if(node->tapetes->topo == NULL){
-        node->tapetes->topo = novo;
+    if(espaco->tapetes->topo == NULL){
+        espaco->tapetes->topo = novo;
         novo->prox = NULL;
     }else{
-        novo->prox = node->tapetes->topo;
-        node->tapetes->topo = novo;
+        novo->prox = espaco->tapetes->topo;
+        espaco->tapetes->topo = novo;
     }
 
-    node->tapetes->tam++;
+    espaco->tapetes->tam++;
 }
 
 //verificam se o nó está dentro do limite do tabuleiro
@@ -566,32 +618,44 @@ int nodeEastIsExist(Assam **assam){
 
 void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual) {
     int l1, l2, r, g, b;
-    char c1, c2;
-    Node *auxL = *tabuleiro;
-    Node *auxC, *tap1, *tap2;
+    char c1, c2, entrada[6];
+    Espaco *auxL = *tabuleiro;
+    Espaco *auxC, *tap1, *tap2;
     corRGB((*jogadorAtual)->cor, &r, &g, &b);
     while(1) {
-        printf("\n  Escolha da \x1b[38;2;%d;%d;%dmprimeira coordenada\x1b[0m:\n  (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
-        scanf(" %d%c", &l1, &c1);
-        c1 = toupper(c1);
+        printf("\n    Escolha da \x1b[38;2;%d;%d;%dmprimeira coordenada\x1b[0m:\n    (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
+        fgets(entrada, sizeof(entrada), stdin);
+        if(sscanf(entrada, "%d%c", &l1, &c1) == 2){
+            c1 = toupper(c1);
+        }else if(sscanf(entrada, "%c%d", &c1, &l1) == 2){
+            c1 = toupper(c1);
+        }else{
+            printf("\n  Formato inválido\n");
+            continue;
+        }
         if((l1 < 1 || l1 > TAM) || (c1-64 < 1 || c1-64 > TAM)) {
             printf("  Coordenadas informadas invalidas. Tente novamente.\n");
             continue;
         }
 
         while(1) {
-            printf("\n  Escolha da \x1b[38;2;%d;%d;%dmsegunda coordenada\x1b[0m:\n  (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
-            scanf(" %d%c", &l2, &c2);
-            c2 = toupper(c2);
+            printf("\n    Escolha da \x1b[38;2;%d;%d;%dmsegunda coordenada\x1b[0m:\n  (\x1b[38;2;%d;%d;%dmLinha\x1b[0m, \x1b[38;2;%d;%d;%dmColuna\x1b[0m): ", r, g, b, r, g, b, r, g, b);
+            fgets(entrada, sizeof(entrada), stdin);
+            if(sscanf(entrada, "%d%c", &l2, &c2) == 2){
+                c2 = toupper(c2);
+            }else if(sscanf(entrada, "%c%d", &c2, &l2) == 2){
+                c2 = toupper(c2);
+            }else{
+                printf("\n    Formato inválido\n");
+                continue;
+            }
             if((l2 < 1 || l2 > TAM) || (c2-64 < 1 || c2-64 > TAM)) {
-                printf("  Coordenadas informadas invalidas. Tente novamente.\n");
+                printf("    Coordenadas informadas invalidas. Tente novamente.\n");
                 continue;
             }
 
             break;           
         }
-
-        while(getchar() != '\n');
 
         auxL = *tabuleiro;
         for(int i=1; i<=TAM; i++) {
@@ -622,22 +686,22 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual) 
         }
         if((*assam)->posicao->norte != tap1 && (*assam)->posicao->leste != tap1 && (*assam)->posicao->sul != tap1 && (*assam)->posicao->oeste != tap1) {
             if((*assam)->posicao->norte != tap2 && (*assam)->posicao->leste != tap2 && (*assam)->posicao->sul != tap2 && (*assam)->posicao->oeste != tap2) {
-                printf("\nPelo menos uma das informacoes passadas deve ser adjacente ao Asaam. Tente novamente:");
+                printf("\n    Pelo menos uma das informacoes passadas deve ser adjacente ao Asaam. Tente novamente:");
                 continue;
             }
         }
         if(tap1->norte != tap2 && tap1->leste != tap2 && tap1->sul != tap2 && tap1->oeste != tap2) {
-            printf("\nO tapete deve ser colocado em duas posicoes adjacentes. Tente novamente:");
+            printf("\n    O tapete deve ser colocado em duas posicoes adjacentes. Tente novamente:");
             continue;
         }
         if(tap1->tapetes->topo != NULL) {
             if(tap1->tapetes->topo->tapete.metade == &(tap2->tapetes->topo->tapete) && tap2->tapetes->topo->tapete.metade == &(tap1->tapetes->topo->tapete)) {
-                printf("\nO tapete nao pode cobrir totalmete outro tapete. Tente novamente:");
+                printf("\n    O tapete nao pode cobrir totalmete outro tapete. Tente novamente:");
                 continue;
             } 
         }
         if(tap1 == (*assam)->posicao || tap2 == (*assam)->posicao) {
-            printf("\nO tapete nao pode ser colocado de baixo do Assam. Tente novamente:");
+            printf("\n    O tapete nao pode ser colocado de baixo do Assam. Tente novamente:");
             continue;
         }
     
@@ -652,7 +716,7 @@ void colocarTapete(Tabuleiro *tabuleiro, Assam **assam, Jogador **jogadorAtual) 
     (*jogadorAtual)->tapetes--;
 }
 
-void areaTapete(Node *espacoAtual, Topo *tapAdj){
+void areaTapete(Espaco *espacoAtual, Pilha *tapAdj){
     NoPilha *novo = (NoPilha*)malloc(sizeof(NoPilha));
     strcpy(novo->tapete.cor, espacoAtual->tapetes->topo->tapete.cor);
     novo->tapete.metade = espacoAtual->tapetes->topo->tapete.metade;
@@ -725,17 +789,24 @@ void areaTapete(Node *espacoAtual, Topo *tapAdj){
     }
 }
 
-void pagarJogador(Assam *assam, Jogador **jogadorAtual) {
-    int r, g, b;
+void pagarJogador(Tabuleiro *tabuleiro, Assam *assam, Jogador **jogadorAtual){
+    if(assam->posicao->tapetes->tam == 0 || ((*jogadorAtual)->cor, assam->posicao->tapetes->topo->tapete.cor) == 0)
+        return;
+
     Jogador *donoTapete = *jogadorAtual;
     while(strcmp(donoTapete->cor, assam->posicao->tapetes->topo->tapete.cor) != 0)
         donoTapete = donoTapete->prox;
+        
+    if(donoTapete->jogando == 0)
+        return;
+        
+    int r, g, b;
     corRGB((*jogadorAtual)->cor, &r, &g, &b);
-    printf("\n\n  O \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m pisou em cima do tapete do ", r, g, b, (*jogadorAtual)->cor);
+    printf("\n\n    O \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m pisou em cima do tapete do ", r, g, b, (*jogadorAtual)->cor);
     corRGB(assam->posicao->tapetes->topo->tapete.cor, &r, &g, &b);
     printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m... hora de pagar o preço", r, g, b, donoTapete->cor);
 
-    Topo *tapAdj = criarPilhaTapetes();
+    Pilha *tapAdj = criarPilhaTapetes();
     areaTapete(assam->posicao, tapAdj);
     int moedas = tapAdj->tam;
     NoPilha *aux, *atual = tapAdj->topo;
@@ -747,75 +818,179 @@ void pagarJogador(Assam *assam, Jogador **jogadorAtual) {
         free(aux);
     }
 
-    printf("\n  Calculando quantas moedas devem ser pagas");
+    printf("\n    Calculando quantas moedas devem ser pagas");
     for(int i = 0; i < 3; i++){
         Sleep(500);
         printf(".");
     }
     printf(" Pronto");
     corRGB((*jogadorAtual)->cor, &r, &g, &b);
-    printf("\n  Transferindo %d moedas do \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m para o ", moedas, r, g, b, (*jogadorAtual)->cor);
+    printf("\n    Transferindo %d moedas do \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m para o ", moedas, r, g, b, (*jogadorAtual)->cor);
     corRGB(donoTapete->cor, &r, &g, &b);
     printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m", r, g, b, donoTapete->cor);
-    (*jogadorAtual)->dinheiro -= moedas;
-    donoTapete->dinheiro += moedas;
     for(int i = 0; i < 3; i++){
         Sleep(500);
         printf(".");
     }
-    printf(" Pronto");
 
-}
-
-int FimDeJogo(Jogador *jogador) {
-    int tap=1;
-    Jogador *aux = jogador;
-    do {
-        aux = aux->prox;
-        if(aux->tapetes > 0) {
-            tap = 0;
-        }            
-    } while(aux != jogador);
+    if((*jogadorAtual)->dinheiro >= moedas){
+        (*jogadorAtual)->dinheiro -= moedas;
+        donoTapete->dinheiro += moedas;
+    }else{
+        donoTapete->dinheiro += (*jogadorAtual)->dinheiro;
+        (*jogadorAtual)->dinheiro = 0;
+    }
     
-    return tap;
+    system("cls");
+    imprimirTabuleiro(tabuleiro, assam);
+    imprimirJogadorAtual(*jogadorAtual, assam);
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
+    printf("\n\n    O \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m pisou em cima do tapete do ", r, g, b, (*jogadorAtual)->cor);
+    corRGB(assam->posicao->tapetes->topo->tapete.cor, &r, &g, &b);
+    printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m... hora de pagar o preço", r, g, b, donoTapete->cor);
+    corRGB((*jogadorAtual)->cor, &r, &g, &b);
+    printf("\n    Transferindo %d moedas do \x1b[38;2;%d;%d;%dmJogador %s\x1b[0m para o ", moedas, r, g, b, (*jogadorAtual)->cor);
+    corRGB(donoTapete->cor, &r, &g, &b);
+    printf("\x1b[38;2;%d;%d;%dmJogador %s\x1b[0m... Pronto", r, g, b, donoTapete->cor);
 }
 
-void condicaoVitoria(Tabuleiro *tabuleiro, Jogador *jogador) {
-    int din=0, empate=0;
-    char vencendor[10];
-    Jogador *aux = jogador;
-    do {
+int fimDeJogo(listaJogadores *jogadores) {
+    Jogador *aux = *jogadores;
+
+    do{
+        if(aux->tapetes > 0 && aux->dinheiro > 0)
+            return 0;
+        aux = aux->prox;   
+    }while(aux != *jogadores);
+    
+    return 1;
+}
+
+void verificaVitoria(Tabuleiro *tabuleiro, listaJogadores *jogadores){
+    int r, g, b;
+    int ptsVermelho = 0;
+    int ptsAzul = 0;
+    int ptsAmarelo = 0;
+    int ptsVerde = 0;
+
+    Jogador *aux = *jogadores;
+    do{
+        if(strcmp(aux->cor, "Vermelho") == 0)
+            ptsVermelho += aux->dinheiro;
+        else if(strcmp(aux->cor, "Azul") == 0)
+            ptsAzul += aux->dinheiro;
+        else if(strcmp(aux->cor, "Amarelo") == 0)
+            ptsAmarelo += aux->dinheiro;
+        else if(strcmp(aux->cor, "Verde") == 0)
+            ptsVerde += aux->dinheiro;
+        
         aux = aux->prox;
-        if(aux->dinheiro > din) {
-            din = aux->dinheiro;
-            strcpy(vencendor, aux->cor);
-        } else if(aux->dinheiro == din) {
-            empate = 1;
+    }while(aux != *jogadores);
+
+    Espaco *inicioLinha = *tabuleiro;
+    Espaco *atual;
+    for(int i = 0; i < TAM; i++){
+        atual = inicioLinha;
+        inicioLinha = inicioLinha->sul;
+        for(int j = 0; j < TAM; j++){
+            if(atual->tapetes->tam != 0){
+                if(strcmp(atual->tapetes->topo->tapete.cor, "Vermelho") == 0)
+                    ptsVermelho++;
+                else if(strcmp(atual->tapetes->topo->tapete.cor, "Azul") == 0)
+                    ptsAzul++;
+                else if(strcmp(atual->tapetes->topo->tapete.cor, "Amarelo") == 0)
+                    ptsAmarelo++;
+                else if(strcmp(atual->tapetes->topo->tapete.cor, "Verde") == 0)
+                    ptsVerde++;
+            }
+
+            atual = atual->leste;
         }
-    } while(aux != jogador);
+    }
+
+    Jogador *vencedor;
+    int ptsVencedor = -1;
+    do{
+        if(strcmp(aux->cor, "Vermelho") == 0){
+            if(ptsVermelho > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsVermelho;
+            }else if(ptsVermelho == ptsVencedor)
+                vencedor = NULL;
+        }else if(strcmp(aux->cor, "Azul") == 0){
+            if(ptsAzul > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsAzul;
+            }else if(ptsAzul == ptsVencedor)
+                vencedor = NULL;
+        }else if(strcmp(aux->cor, "Amarelo") == 0){
+            if(ptsAmarelo > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsAmarelo;
+            }else if(ptsAmarelo == ptsVencedor)
+                vencedor = NULL;
+        }else if(strcmp(aux->cor, "Verde") == 0){
+            if(ptsVerde > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsVerde;
+            }else if(ptsVerde == ptsVencedor)
+                vencedor = NULL;
+        }
+
+        aux = aux->prox;
+    }while(aux != *jogadores);
     
-    if(empate == 0) {
-        printf("\nVENCEDOR: Jogador %s", vencendor);
+    if(vencedor != NULL){
+        corRGB(vencedor->cor, &r, &g, &b);
+        printf("\n\n     Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m venceu a partida!", r, g, b, vencedor->cor);
+        printf("\n     Pontos totais: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, ptsVencedor);
         return;
     }
 
-    int tapdin=0;
-    empate = 0;
-    do {
-        if((aux->dinheiro + aux->tapetes) > tapdin) {
-            tapdin = aux->dinheiro + aux->tapetes;
-            strcpy(vencendor, aux->cor);
-        } else if((aux->dinheiro + aux->tapetes) == tapdin) {
-            empate = 1;
+    ptsVencedor = -1;
+
+    do{
+        if(strcmp(aux->cor, "Vermelho") == 0){
+            if(ptsVermelho > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsVermelho;
+            }else if(ptsVermelho == ptsVencedor)
+                break;
+        }else if(strcmp(aux->cor, "Azul") == 0){
+            if(ptsAzul > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsAzul;
+            }else if(ptsAzul == ptsVencedor)
+                break;
+        }else if(strcmp(aux->cor, "Amarelo") == 0){
+            if(ptsAmarelo > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsAmarelo;
+            }else if(ptsAmarelo == ptsVencedor)
+                break;
+        }else if(strcmp(aux->cor, "Verde") == 0){
+            if(ptsVerde > ptsVencedor){
+                vencedor = aux;
+                ptsVencedor = ptsVerde;
+            }else if(ptsVerde == ptsVencedor)
+                break;
         }
-    } while(aux != jogador);
-    if(empate == 0) {
-        printf("\nVENCEDOR: Jogador %s", vencendor);
-    
-    } else {
-        printf("\nEMPATE");
+
+        aux = aux->prox;
+    }while(aux != *jogadores);
+
+    if(aux == *jogadores){
+        corRGB(vencedor->cor, &r, &g, &b);
+        printf("\n\n     Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m venceu no desempate!", r, g, b, vencedor->cor);
+        printf("\n     Pontos totais: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, ptsVencedor);
+        return;
     }
 
+    corRGB(vencedor->cor, &r, &g, &b);
+    printf("\n\n     Empate! Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m empatou com o", r, g, b, vencedor->cor);
+    corRGB(aux->cor, &r, &g, &b);
+    printf("Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m", r, g, b, aux->cor);
+    printf("\n     Pontos totais: %d", ptsVencedor);
 }
 
 void corRGB(char cor[], int *r, int *g, int *b){

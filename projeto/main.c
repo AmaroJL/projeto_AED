@@ -12,14 +12,14 @@ int main()
     listaJogadores* jogadores = inicializarJogadores();
     Jogador *jogadorAtual = *jogadores;
     int jogoEncerrado = 0;
-    while(jogoEncerrado == 0){
+    while(!jogoEncerrado){
         imprimirTabuleiro(tabuleiro, assam);
         imprimirJogadorAtual(jogadorAtual, assam);
         fazerJogada(tabuleiro, &assam, &jogadorAtual);
-        if(FimDeJogo(jogadorAtual) == 1) jogoEncerrado = 1;
+        jogoEncerrado = fimDeJogo(jogadores);
     }
     printf("\njogo encerrado!\n");
-    condicaoVitoria(tabuleiro, jogadorAtual);
+    verificaVitoria(tabuleiro, jogadores);
     
     return 0;
 }
