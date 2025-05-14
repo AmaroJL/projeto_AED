@@ -28,7 +28,7 @@ int nodeWestIsExist(Assam **);
 void colocarTapete(Tabuleiro*, Assam**, Jogador**);
 void pagarJogador(Tabuleiro*, Assam*, Jogador**);
 int fimDeJogo(listaJogadores*);
-void verificaVitoria(Tabuleiro*, listaJogadores*);
+void verificaVitoria(Tabuleiro*, listaJogadores*, Assam*);
 void corRGB(char[], int *, int *, int *);
 
 #endif // MARRAKECH_H_INCLUDED

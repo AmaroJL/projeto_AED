@@ -19,7 +19,7 @@ int main()
         jogoEncerrado = fimDeJogo(jogadores);
     }
     printf("\njogo encerrado!\n");
-    verificaVitoria(tabuleiro, jogadores);
+    verificaVitoria(tabuleiro, jogadores, assam);
     
     return 0;
 }

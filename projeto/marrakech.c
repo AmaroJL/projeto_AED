@@ -42,6 +42,7 @@ typedef struct jogador{
     int tapetes;
     int jogando;
     char cor[10];
+    int ptTotais;
     struct jogador *prox;
 }Jogador;
 
@@ -195,6 +196,8 @@ Jogador* criarJogador(){
     Jogador *novoJogador = (Jogador*)malloc(sizeof(Jogador));
     strcpy(novoJogador->cor, "\0");
     novoJogador->dinheiro = 30;
+    novoJogador->jogando = 1;
+    novoJogador->ptTotais = 0;
     novoJogador->prox = NULL;
     novoJogador->tapetes = 12;
 
@@ -220,9 +223,6 @@ listaJogadores* inicializarJogadores(){
     if(qtd == 2){
         strcpy(jogador1->cor, "Vermelho");
         strcpy(jogador2->cor, "Azul");
-
-        jogador1->jogando = 1;
-        jogador2->jogando = 1;
     
         jogador1->prox = jogador2;
         jogador2->prox = jogador1;  
@@ -232,10 +232,6 @@ listaJogadores* inicializarJogadores(){
         strcpy(jogador1->cor, "Vermelho");
         strcpy(jogador2->cor, "Azul");
         strcpy(jogador3->cor, "Amarelo");
-
-        jogador1->jogando = 1;
-        jogador2->jogando = 1;
-        jogador3->jogando = 1;
 
         jogador1->prox = jogador2;
         jogador2->prox = jogador3;
@@ -248,11 +244,6 @@ listaJogadores* inicializarJogadores(){
         strcpy(jogador2->cor, "Azul");
         strcpy(jogador3->cor, "Amarelo");
         strcpy(jogador4->cor, "Verde");
-        
-        jogador1->jogando = 1;
-        jogador2->jogando = 1;
-        jogador3->jogando = 1;
-        jogador4->jogando = 1;
         
         jogador1->prox = jogador2;
         jogador2->prox = jogador3;
@@ -866,24 +857,18 @@ int fimDeJogo(listaJogadores *jogadores) {
     return 1;
 }
 
-void verificaVitoria(Tabuleiro *tabuleiro, listaJogadores *jogadores){
+void verificaVitoria(Tabuleiro *tabuleiro, listaJogadores *jogadores, Assam *assam){
     int r, g, b;
-    int ptsVermelho = 0;
-    int ptsAzul = 0;
-    int ptsAmarelo = 0;
-    int ptsVerde = 0;
+    int tpsVermelho = 0;
+    int tpsAzul = 0;
+    int tpsAmarelo = 0;
+    int tpsVerde = 0;
+
+    imprimirTabuleiro(tabuleiro, assam);
 
     Jogador *aux = *jogadores;
     do{
-        if(strcmp(aux->cor, "Vermelho") == 0)
-            ptsVermelho += aux->dinheiro;
-        else if(strcmp(aux->cor, "Azul") == 0)
-            ptsAzul += aux->dinheiro;
-        else if(strcmp(aux->cor, "Amarelo") == 0)
-            ptsAmarelo += aux->dinheiro;
-        else if(strcmp(aux->cor, "Verde") == 0)
-            ptsVerde += aux->dinheiro;
-        
+        aux->ptTotais += aux->dinheiro;
         aux = aux->prox;
     }while(aux != *jogadores);
 
@@ -895,47 +880,43 @@ void verificaVitoria(Tabuleiro *tabuleiro, listaJogadores *jogadores){
         for(int j = 0; j < TAM; j++){
             if(atual->tapetes->tam != 0){
                 if(strcmp(atual->tapetes->topo->tapete.cor, "Vermelho") == 0)
-                    ptsVermelho++;
+                    tpsVermelho++;
                 else if(strcmp(atual->tapetes->topo->tapete.cor, "Azul") == 0)
-                    ptsAzul++;
+                    tpsAzul++;
                 else if(strcmp(atual->tapetes->topo->tapete.cor, "Amarelo") == 0)
-                    ptsAmarelo++;
+                    tpsAmarelo++;
                 else if(strcmp(atual->tapetes->topo->tapete.cor, "Verde") == 0)
-                    ptsVerde++;
+                    tpsVerde++;
             }
 
             atual = atual->leste;
         }
     }
 
-    Jogador *vencedor;
-    int ptsVencedor = -1;
     do{
-        if(strcmp(aux->cor, "Vermelho") == 0){
-            if(ptsVermelho > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsVermelho;
-            }else if(ptsVermelho == ptsVencedor)
-                vencedor = NULL;
-        }else if(strcmp(aux->cor, "Azul") == 0){
-            if(ptsAzul > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsAzul;
-            }else if(ptsAzul == ptsVencedor)
-                vencedor = NULL;
-        }else if(strcmp(aux->cor, "Amarelo") == 0){
-            if(ptsAmarelo > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsAmarelo;
-            }else if(ptsAmarelo == ptsVencedor)
-                vencedor = NULL;
-        }else if(strcmp(aux->cor, "Verde") == 0){
-            if(ptsVerde > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsVerde;
-            }else if(ptsVerde == ptsVencedor)
-                vencedor = NULL;
-        }
+        if(strcmp(aux->cor, "Vermelho") == 0)
+            aux->ptTotais += tpsVermelho;
+        else if(strcmp(aux->cor, "Azul") == 0)
+            aux->ptTotais += tpsAzul;
+        else if(strcmp(aux->cor, "Amarelo") == 0)
+            aux->ptTotais += tpsAmarelo;
+        else if(strcmp(aux->cor, "Verde") == 0)
+            aux->ptTotais += tpsVerde;
+
+
+        aux = aux->prox;
+    }while(aux != *jogadores);
+
+    Jogador *vencedor, *empate = NULL;
+    int ptsVencedor = -1;
+
+    do{
+        if(aux->ptTotais > ptsVencedor){
+            ptsVencedor = aux->ptTotais;
+            vencedor = aux;
+        }else if(aux->ptTotais == ptsVencedor){
+            vencedor = NULL;
+        }    
 
         aux = aux->prox;
     }while(aux != *jogadores);
@@ -943,54 +924,46 @@ void verificaVitoria(Tabuleiro *tabuleiro, listaJogadores *jogadores){
     if(vencedor != NULL){
         corRGB(vencedor->cor, &r, &g, &b);
         printf("\n\n     Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m venceu a partida!", r, g, b, vencedor->cor);
-        printf("\n     Pontos totais: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, ptsVencedor);
+        printf("\n     Dinheiro restante: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, vencedor->dinheiro);
+        printf("\n     Tapetes visíveis: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, vencedor->ptTotais - vencedor->dinheiro);
+        printf("\n     Pontos totais: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, vencedor->ptTotais);
         return;
     }
 
     ptsVencedor = -1;
 
     do{
-        if(strcmp(aux->cor, "Vermelho") == 0){
-            if(ptsVermelho > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsVermelho;
-            }else if(ptsVermelho == ptsVencedor)
-                break;
-        }else if(strcmp(aux->cor, "Azul") == 0){
-            if(ptsAzul > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsAzul;
-            }else if(ptsAzul == ptsVencedor)
-                break;
-        }else if(strcmp(aux->cor, "Amarelo") == 0){
-            if(ptsAmarelo > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsAmarelo;
-            }else if(ptsAmarelo == ptsVencedor)
-                break;
-        }else if(strcmp(aux->cor, "Verde") == 0){
-            if(ptsVerde > ptsVencedor){
-                vencedor = aux;
-                ptsVencedor = ptsVerde;
-            }else if(ptsVerde == ptsVencedor)
-                break;
+        if(aux->dinheiro > ptsVencedor){
+            vencedor = aux;
+            ptsVencedor = aux->dinheiro;
+        }else if(aux->dinheiro == ptsVencedor){
+            empate = aux;
         }
 
         aux = aux->prox;
     }while(aux != *jogadores);
 
-    if(aux == *jogadores){
+    if(empate == NULL){
         corRGB(vencedor->cor, &r, &g, &b);
         printf("\n\n     Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m venceu no desempate!", r, g, b, vencedor->cor);
+        printf("\n     Dinheiro restante: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, vencedor->dinheiro);
+        printf("\n     Tapetes visíveis: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, vencedor->ptTotais - vencedor->dinheiro);
         printf("\n     Pontos totais: \x1b[38;2;%d;%d;%dm%d\x1b[0m",  r, g, b, ptsVencedor);
         return;
     }
 
     corRGB(vencedor->cor, &r, &g, &b);
-    printf("\n\n     Empate! Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m empatou com o", r, g, b, vencedor->cor);
+    printf("\n\n     Empate! Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m empatou com o ", r, g, b, vencedor->cor);
     corRGB(aux->cor, &r, &g, &b);
-    printf("Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m", r, g, b, aux->cor);
-    printf("\n     Pontos totais: %d", ptsVencedor);
+    corRGB(empate->cor, &r, &g, &b);
+    printf("Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m", r, g, b, empate->cor);
+    corRGB(vencedor->cor, &r, &g, &b);
+    printf("\n     Dinheiro restante do Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m: \x1b[38;2;%d;%d;%dm%d\x1b[0m", r, g, b, vencedor->cor,  r, g, b, vencedor->dinheiro);
+    printf("\n     Dinheiro visíveis do Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m: \x1b[38;2;%d;%d;%dm%d\x1b[0m", r, g, b, vencedor->cor,  r, g, b, vencedor->ptTotais - vencedor->dinheiro);
+    corRGB(empate->cor, &r, &g, &b);
+    printf("\n     Dinheiro restante do Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m: \x1b[38;2;%d;%d;%dm%d\x1b[0m", r, g, b, empate->cor,  r, g, b, empate->dinheiro);
+    printf("\n     Dinheiro visíveis do Jogador \x1b[38;2;%d;%d;%dm%s\x1b[0m: \x1b[38;2;%d;%d;%dm%d\x1b[0m", r, g, b, empate->cor,  r, g, b, empate->ptTotais - empate->dinheiro);
+    printf("\n     Pontos totais: %d", empate->ptTotais);
 }
 
 void corRGB(char cor[], int *r, int *g, int *b){
