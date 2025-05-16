@@ -781,7 +781,7 @@ void areaTapete(Espaco *espacoAtual, Pilha *tapAdj){
 }
 
 void pagarJogador(Tabuleiro *tabuleiro, Assam *assam, Jogador **jogadorAtual){
-    if(assam->posicao->tapetes->tam == 0 || ((*jogadorAtual)->cor, assam->posicao->tapetes->topo->tapete.cor) == 0)
+    if(assam->posicao->tapetes->tam == 0 || strcmp((*jogadorAtual)->cor, assam->posicao->tapetes->topo->tapete.cor) == 0)
         return;
 
     Jogador *donoTapete = *jogadorAtual;
