@@ -1,2 +1,2 @@
 # projeto_AED
-Jogo de tabuleiro "Assam"
+Jogo de tabuleiro "Marrakech" implementado em linguagem C. 
