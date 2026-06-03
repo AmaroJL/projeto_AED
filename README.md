@@ -1,6 +1,6 @@
 # projeto_AED
-Jogo de tabuleiro "Marrakech" implementado em linguagem C.
-Projeto da cadeira **Estrutura e Análise de Dados** 
+Jogo de tabuleiro "Marrakech" implementado em linguagem C. <br>
+Projeto da cadeira **Análise e Estruturas de Dados** 
 ## Curso: 
 Ciência da Computação 
 ## Univercidade: 
